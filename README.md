@@ -44,7 +44,7 @@ The Decentralized Quiz App is a blockchain-based quiz platform built using Sorob
 
 > 🔗 https://stellar.expert/explorer/testnet/tx/8e95842355b6981e1926687e1433116a2c3efe2b286ba3a786b01d75f30f69a3  
 
-🔗 https://lab.stellar.org/r/testnet/contract/CCATST7MXGZQWB6HQCHDLUKUZA6MVK4KIGCDFVQ34COE543GTINOK3BL
+> 🔗 https://lab.stellar.org/r/testnet/contract/CCATST7MXGZQWB6HQCHDLUKUZA6MVK4KIGCDFVQ34COE543GTINOK3BL
 
 
 <img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/734c4fbc-1314-4e32-a05f-77344a79bbd0" />
