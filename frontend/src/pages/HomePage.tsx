@@ -16,13 +16,18 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
   const [totalQuizzes, setTotalQuizzes] = useState<number | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
 
+  const [errorStatus, setErrorStatus] = useState<string | null>(null);
+
   useEffect(() => {
     async function checkCount() {
       try {
+        setErrorStatus(null);
         const count = await getTotalQuizzes();
         setTotalQuizzes(count);
-      } catch {
-        // Fallback
+      } catch (e: any) {
+        console.error('Initial check failed:', e);
+        setErrorStatus(e.message || 'Simulation failure');
+        setTotalQuizzes(null);
       }
     }
     checkCount();

@@ -43,6 +43,16 @@ const QUIZ_QUESTIONS: Question[] = [
   },
 ];
 
+// Helper to shuffle the array
+function shuffleArray<T>(array: T[]): T[] {
+  const newArr = [...array];
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+  return newArr;
+}
+
 interface QuizPageProps {
   userAddress: string;
   onSubmitAnswer: (qId: number, answer: string) => Promise<boolean | null>;
@@ -68,6 +78,7 @@ export function QuizPage({
   const [onChainCount, setOnChainCount] = useState(0);
   const [isEmpty, setIsEmpty] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [questions] = useState<Question[]>(() => shuffleArray(QUIZ_QUESTIONS));
 
   useEffect(() => {
     async function checkState() {
@@ -91,8 +102,8 @@ export function QuizPage({
   };
   const [accountStatus, setAccountStatus] = useState<AccountStatus>('checking');
 
-  const currentQuestion = QUIZ_QUESTIONS[currentIndex];
-  const isLastQuestion = currentIndex === QUIZ_QUESTIONS.length - 1;
+  const currentQuestion = questions[currentIndex];
+  const isLastQuestion = currentIndex === questions.length - 1;
   const friendbotUrl = `https://friendbot.stellar.org/?addr=${userAddress}`;
 
   // ── Check if account is funded on testnet ──────────────────────────────────
@@ -185,7 +196,7 @@ export function QuizPage({
     setError(null);
     if (isLastQuestion) {
       const score = Object.values(results).filter((r) => r.correct).length;
-      onComplete(score, QUIZ_QUESTIONS.length);
+      onComplete(score, questions.length);
     } else {
       setCurrentIndex((prev) => prev + 1);
     }
@@ -213,7 +224,7 @@ export function QuizPage({
 
       {/* On-Chain Empty State Warning */}
       {isEmpty && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="fixed bottom-24 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl bg-amber-900/50 border border-amber-500/50 p-4 rounded-xl flex items-center justify-between backdrop-blur-sm z-50"
@@ -283,7 +294,7 @@ export function QuizPage({
             key={currentIndex}
             question={currentQuestion}
             currentIndex={currentIndex}
-            total={QUIZ_QUESTIONS.length}
+            total={questions.length}
             result={results[currentQuestion.id] ?? null}
             isSubmitting={isSubmitting}
             alreadyAnswered={answeredIds.has(currentQuestion.id)}
