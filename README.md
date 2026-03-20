@@ -60,7 +60,11 @@ To run the web application locally:
 
 ---
 
-<img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/734c4fbc-1314-4e32-a05f-77344a79bbd0" />
+<img width="1916" height="1079" alt="1" src="https://github.com/user-attachments/assets/91bc099a-b1d1-493f-b155-737581d6885b" />
+<img width="1912" height="1079" alt="2" src="https://github.com/user-attachments/assets/fa74b0f0-7262-4b6d-bb2f-5c9d3a16a92b" />
+<img width="1906" height="874" alt="3" src="https://github.com/user-attachments/assets/e0582d45-b9b3-4768-89e1-2eb2df8b51ec" />
+
+
 
 
 ---
