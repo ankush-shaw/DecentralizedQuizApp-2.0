@@ -105,11 +105,19 @@ async function simulateCall(funcName: string, args: any[]): Promise<any> {
       // FIX: Used a guaranteed valid 56-character public key for simulation
       const dummyPK = 'GBBIG4HLPGTLG6BH6YREVWJXEQ4NX74HTD444JD6A6XYS7DOFL2J6DEI';
       
-      const tx = new TransactionBuilder({
-        accountId: () => dummyPK,
-        sequenceNumber: () => '1',
-        incrementSequenceNumber: () => {},
-      } as any, {
+      // Fetch real account if possible, otherwise use dummy logic
+      let account;
+      try {
+        account = await server.getAccount(dummyPK);
+      } catch (e) {
+        account = {
+          accountId: () => dummyPK,
+          sequenceNumber: () => '1',
+          incrementSequenceNumber: () => {},
+        } as any;
+      }
+      
+      const tx = new TransactionBuilder(account, {
         fee: BASE_FEE,
         networkPassphrase: NETWORK_PASSPHRASE,
       })
@@ -213,7 +221,7 @@ export async function initializeContract(userAddress: string): Promise<void> {
       )).setTimeout(30).build();
 
     const prepared = await server.prepareTransaction(tx);
-    const { signedTxXdr, error } = (await signTransaction(tx.toXDR(), { networkPassphrase: NETWORK_PASSPHRASE })) as any;
+    const { signedTxXdr, error } = (await signTransaction(prepared.toXDR(), { networkPassphrase: NETWORK_PASSPHRASE })) as any;
     if (error || !signedTxXdr) throw new Error('Signing failed');
 
     const result = await server.sendTransaction(TransactionBuilder.fromXDR(signedTxXdr, NETWORK_PASSPHRASE));
