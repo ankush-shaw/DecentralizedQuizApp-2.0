@@ -40,11 +40,25 @@ The Decentralized Quiz App is a blockchain-based quiz platform built using Sorob
 
 ---
 
-## 🌐 Deployed Smart Contract
+## 🌐 Deployed Smart Contract Link
 
 - 🔗 Explorer: https://stellar.expert/explorer/testnet/contract/CCATST7MXGZQWB6HQCHDLUKUZA6MVK4KIGCDFVQ34COE543GTINOK3BL  
 - 🆔 Contract ID: CCATST7MXGZQWB6HQCHDLUKUZA6MVK4KIGCDFVQ34COE543GTINOK3BL
 
+> 🔗 https://lab.stellar.org/r/testnet/contract/CCATST7MXGZQWB6HQCHDLUKUZA6MVK4KIGCDFVQ34COE543GTINOK3BL
+
+---
+
+## 🖥️ Running the Frontend
+
+To run the web application locally:
+
+1. Navigate to the frontend directory: `cd frontend`
+2. Install dependencies: `npm install`
+3. Start the dev server: `npm run dev`
+4. Use **Freighter Wallet** on Testnet to interact.
+
+---
 
 <img width="1919" height="1019" alt="image" src="https://github.com/user-attachments/assets/734c4fbc-1314-4e32-a05f-77344a79bbd0" />
 
