@@ -2,7 +2,6 @@
 
 [![Stellar](https://img.shields.io/badge/Network-Stellar-blue?style=for-the-badge&logo=stellar)](https://stellar.org)
 [![Soroban](https://img.shields.io/badge/Standard-Soroban-green?style=for-the-badge&logo=rust)](https://soroban.stellar.org)
-[![CI/CD](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/actions/workflows/ci.yml/badge.svg)](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 A transparent, tamper-proof quiz platform built on the **Stellar Network** using **Soroban** smart contracts. This dApp ensures fairness by storing questions, evaluating answers, and tracking scores entirely on-chain.
@@ -27,7 +26,8 @@ A transparent, tamper-proof quiz platform built on the **Stellar Network** using
 ## 📱 Mobile Responsive View
 
 <p align="center">
-  <img width="40%" alt="Mobile Responsive View" src="./frontend/public/mobile-screenshot.png" />
+ <img width="273" height="585" alt="image" src="https://github.com/user-attachments/assets/57e9d851-b0f0-47cf-b493-cb7ee3971e6e" />
+
   <br>
   <em>Fully responsive layout on mobile (390px viewport — iPhone 14)</em>
 </p>
@@ -37,8 +37,6 @@ A transparent, tamper-proof quiz platform built on the **Stellar Network** using
 ---
 
 ## ⚙️ CI/CD Pipeline
-
-[![CI/CD Pipeline](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/actions/workflows/ci.yml/badge.svg)](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/actions/workflows/ci.yml)
 
 The project uses **GitHub Actions** to automatically run on every push and pull request to `main`:
 
@@ -134,7 +132,7 @@ test test::test_submit_incorrect_answer ... ok
 test result: ok. 3 passed; 0 failed; 0 ignored
 ```
 
-<img width="884" height="162" alt="Contract tests passing" src="https://github.com/user-attachments/assets/5735c3a8-0580-4129-b6b9-118740d24418" />
+<img width="987" height="171" alt="Screenshot 2026-04-27 195701" src="https://github.com/user-attachments/assets/e4ce5058-5dc5-4d95-b13b-40411c52a2c3" />
 
 ---
 
