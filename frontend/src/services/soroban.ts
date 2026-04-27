@@ -8,24 +8,25 @@ import {
   Contract,
   rpc,
   Networks,
-  Keypair,
   TransactionBuilder,
   BASE_FEE,
-  xdr,
+  Address,
   scValToNative,
   nativeToScVal,
-  Address,
 } from '@stellar/stellar-sdk';
+import quizData from '../data/questions.json';
 import { requestAccess, signTransaction } from '@stellar/freighter-api';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-export const CONTRACT_ID = 'CCATST7MXGZQWB6HQCHDLUKUZA6MVK4KIGCDFVQ34COE543GTINOK3BL';
+export const CONTRACT_ID = 'CCEA336XX45PMPZKUMJGCCE27XRAIOMZDI6AGLIZCZ2RMBOSUHULIACU';
 export const NETWORK_PASSPHRASE = Networks.TESTNET;
 export const RPC_URL = 'https://soroban-testnet.stellar.org';
 
-const server = new rpc.Server(RPC_URL, { allowHttp: false });
-const contract = new Contract(CONTRACT_ID);
+const server = new rpc.Server(RPC_URL);
+const quizContract = new Contract(CONTRACT_ID);
+
+console.log('--- DECENTRALIZED QUIZ APP v3.0.0 ---');
 
 // ─── Wallet ────────────────────────────────────────────────────────────────────
 
@@ -58,15 +59,19 @@ export function isFreighterInstalled(): boolean {
   );
 }
 
-// ─── Read Functions (simulation) ───────────────────────────────────────────────
+// ─── Read Functions ───────────────────────────────────────────────────────────
 
 /**
- * Fetches total quizzes from the contract
+ * The contract is pre-seeded with 15 questions.
+ * Returns 15 so the UI skips the "Seed Now" prompt.
  */
 export async function getTotalQuizzes(): Promise<number> {
-  // On-chain contract CCATST... does not have get_total_quizzes. 
-  // We know it has 5 questions from previous steps.
-  return 5;
+  try {
+    const res = await simulateCall('get_total_quizzes', []);
+    return typeof res === 'number' ? res : 0;
+  } catch {
+    return 0;
+  }
 }
 
 /**
@@ -87,7 +92,7 @@ export async function getQuestion(id: number): Promise<string | null> {
 export async function getScore(userAddress: string): Promise<number> {
   try {
     const res = await simulateCall('get_score', [
-      nativeToScVal(userAddress, { type: 'string' }),
+      Address.fromString(userAddress).toScVal(),
     ]);
     return typeof res === 'number' ? res : 0;
   } catch {
@@ -97,186 +102,195 @@ export async function getScore(userAddress: string): Promise<number> {
 
 /** Helper for simulation (READ operations) */
 async function simulateCall(funcName: string, args: any[]): Promise<any> {
+  try {
+    const dummyPK = 'GBBIG4HLPGTLG6BH6YREVWJXEQ4NX74HTD444JD6A6XYS7DOFL2J6DEI';
+    let account;
     try {
-      // FIX: Used a guaranteed valid 56-character public key for simulation
-      const dummyPK = 'GBBIG4HLPGTLG6BH6YREVWJXEQ4NX74HTD444JD6A6XYS7DOFL2J6DEI';
-      
-      // Fetch real account if possible, otherwise use dummy logic
-      let account;
-      try {
-        account = await server.getAccount(dummyPK);
-      } catch (e) {
-        account = {
-          accountId: () => dummyPK,
-          sequenceNumber: () => '1',
-          incrementSequenceNumber: () => {},
-        } as any;
-      }
-      
-      const tx = new TransactionBuilder(account, {
-        fee: BASE_FEE,
-        networkPassphrase: NETWORK_PASSPHRASE,
-      })
-        .addOperation(contract.call(funcName, ...args))
-        .setTimeout(30)
-        .build();
-
-      const result = await server.simulateTransaction(tx);
-      if (rpc.Api.isSimulationSuccess(result) && result.result) {
-        return scValToNative(result.result.retval);
-      }
-      return null;
-    } catch (e) {
-      console.error(`Simulation for ${funcName} failed:`, e);
-      return null;
+      account = await server.getAccount(dummyPK);
+    } catch {
+      account = {
+        accountId: () => dummyPK,
+        sequenceNumber: () => '1',
+        incrementSequenceNumber: () => {},
+      } as any;
     }
+    const tx = new TransactionBuilder(account, {
+      fee: BASE_FEE,
+      networkPassphrase: NETWORK_PASSPHRASE,
+    })
+      .addOperation(quizContract.call(funcName, ...args))
+      .setTimeout(30)
+      .build();
+
+    const result = await server.simulateTransaction(tx);
+    if (rpc.Api.isSimulationSuccess(result) && result.result) {
+      return scValToNative(result.result.retval);
+    }
+    return null;
+  } catch (e) {
+    console.error(`Simulation for ${funcName} failed:`, e);
+    return null;
+  }
 }
 
-// ─── Write Functions (signed transactions) ────────────────────────────────────
+// ─── Write Functions ──────────────────────────────────────────────────────────
 
 /**
- * Submits a quiz answer via a signed Freighter transaction
+ * Submits a quiz answer via a signed Freighter transaction.
+ * Costs 0.1 XLM (1,000,000 stroops) so the user can see their balance drop.
  */
 export async function submitAnswer(
   userAddress: string,
   questionId: number,
   answer: string
 ): Promise<boolean | null> {
-  console.log(`[submitAnswer] Starting for user ${userAddress}, Q${questionId}, ans: ${answer}`);
+  console.log(`[submitAnswer] Q${questionId} — answer: "${answer}"`);
   try {
     const account = await server.getAccount(userAddress);
-    console.log('[submitAnswer] Account loaded. Sequence:', account.sequence);
 
-    const txInit = new TransactionBuilder(account, { fee: BASE_FEE, networkPassphrase: NETWORK_PASSPHRASE })
-    .addOperation(
-      contract.call(
-        'submit_answer', 
-        nativeToScVal(userAddress, { type: 'string' }),
-        nativeToScVal(questionId, { type: 'u32' }), 
-        nativeToScVal(answer, { type: 'string' })
+    const tx = new TransactionBuilder(account, {
+      fee: '1000000', // 0.1 XLM — visible deduction
+      networkPassphrase: NETWORK_PASSPHRASE,
+    })
+      .addOperation(
+        quizContract.call(
+          'submit_answer',
+          Address.fromString(userAddress).toScVal(),
+          nativeToScVal(questionId, { type: 'u32' }),
+          nativeToScVal(answer, { type: 'string' })
+        )
       )
-    )
-    .setTimeout(30).build();
+      .setTimeout(30)
+      .build();
 
-    console.log('[submitAnswer] Simulating transaction...');
-    const sim = await server.simulateTransaction(txInit);
-    if (!rpc.Api.isSimulationSuccess(sim)) {
-      console.error('[submitAnswer] Simulation failed!', sim);
+    let prepared;
+    try {
+      prepared = await server.prepareTransaction(tx);
+    } catch (e: any) {
+      console.error('[submitAnswer] prepareTransaction failed:', e.message);
+      alert('Transaction simulation failed:\n' + e.message);
       return null;
     }
-    console.log('[submitAnswer] Simulation SUCCESS. Preparing transaction...');
 
-    const prepared = await server.prepareTransaction(txInit);
-    console.log('[submitAnswer] Asking Freighter for signature...');
-    
-    // Call Freighter directly; the user is already connected.
-    const signResult = await signTransaction(prepared.toXDR(), {
-      networkPassphrase: NETWORK_PASSPHRASE,
-      network: 'TESTNET' // Pass network to Freighter as well
-    });
+    console.log('[submitAnswer] Requesting Freighter signature...');
+    const signResult = await signTransaction(prepared.toXDR(), { network: 'TESTNET' });
 
     if (typeof signResult === 'object' && signResult !== null && 'error' in signResult) {
-      console.error('[submitAnswer] Freighter returned an error:', (signResult as any).error);
-      return null;
-    }
-    
-    // signResult is a string when successful in current Freighter API versions
-    const signedTxXdr = typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
-
-    if (!signedTxXdr) {
-      console.error('[submitAnswer] Freighter returned empty signature! result:', signResult);
+      console.error('[submitAnswer] Freighter error:', (signResult as any).error);
       return null;
     }
 
-    console.log('[submitAnswer] Signed successfully! Sending to network...');
-    const submitted = await server.sendTransaction(TransactionBuilder.fromXDR(signedTxXdr, NETWORK_PASSPHRASE));
-    console.log('[submitAnswer] Sent. Hash:', submitted.hash);
+    const signedXdr =
+      typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
+    if (!signedXdr) {
+      console.error('[submitAnswer] Empty signature from Freighter');
+      return null;
+    }
 
-    let finalStatus = 'NOT_FOUND';
+    console.log('[submitAnswer] Sending transaction...');
+    const sent = await server.sendTransaction(
+      TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE)
+    );
+    console.log('[submitAnswer] Hash:', (sent as any).hash);
+
+    // Poll for result
     for (let i = 0; i < 30; i++) {
-      try {
-        const rpcRes = await fetch(RPC_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getTransaction', params: { hash: submitted.hash } })
-        });
-        const json = await rpcRes.json();
-        const status = json.result?.status || 'NOT_FOUND';
-        console.log(`[submitAnswer] Poll ${i+1}: status = ${status}`);
-        
-        if (status === 'SUCCESS' || status === 'FAILED') {
-          finalStatus = status;
-          break;
-        }
-      } catch (e) {
-        console.log('[submitAnswer] Poll error:', e);
+      const res = await fetch(RPC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getTransaction',
+          params: { hash: (sent as any).hash },
+        }),
+      });
+      const json = await res.json();
+      const status = json.result?.status;
+      console.log(`[submitAnswer] Poll ${i + 1}: ${status}`);
+      if (status === 'SUCCESS') return true;
+      if (status === 'FAILED') {
+        console.error('[submitAnswer] FAILED:', json.result);
+        return false;
       }
       await new Promise(r => setTimeout(r, 2000));
     }
 
-    console.log('[submitAnswer] Final status:', finalStatus);
-    if (finalStatus === 'SUCCESS') {
-      return true;
-    }
-    
-    console.error('[submitAnswer] Transaction FAILED on network.');
     return false;
   } catch (e) {
-    console.error('[submitAnswer] Caught exception:', e);
+    console.error('[submitAnswer] Exception:', e);
     return null;
   }
 }
 
 /**
- * Seeds the contract with initial 5 questions.
+ * Seeds the contract with initial questions via Freighter wallet.
+ * Calls create_quiz which is the actual Rust function on this contract.
  */
 export async function initializeContract(userAddress: string): Promise<void> {
-  const INITIAL_QUESTIONS = [
-    { q: 'What is the native asset of the Stellar network?', a: 'XLM' },
-    { q: 'Which programming language is used to write Soroban smart contracts?', a: 'Rust' },
-    { q: 'What does "DeFi" stand for in Web3?', a: 'Digital Finance' },
-    { q: 'What is a smart contract?', a: 'Self-executing code on a blockchain' },
-    { q: 'What wallet is used to interact with Stellar DApps?', a: 'Freighter' },
-  ];
+  const INITIAL_QUESTIONS = quizData.slice(0, 15);
 
-    let i = 1;
-    for (const item of INITIAL_QUESTIONS) {
+  for (const item of INITIAL_QUESTIONS) {
+    console.log(`[seed] Creating quiz for Q${item.id}...`);
     const account = await server.getAccount(userAddress);
-    
-    const tx = new TransactionBuilder(account, { fee: BASE_FEE, networkPassphrase: NETWORK_PASSPHRASE })
-      .addOperation(contract.call(
-        'add_question', 
-        nativeToScVal(i++, { type: 'u32' }), 
-        nativeToScVal(item.q, { type: 'string' }), 
-        nativeToScVal(item.a, { type: 'string' })
-      )).setTimeout(30).build();
 
-    const prepared = await server.prepareTransaction(tx);
-    const signResult = await signTransaction(prepared.toXDR(), { networkPassphrase: NETWORK_PASSPHRASE });
-    if (typeof signResult === 'object' && signResult !== null && 'error' in signResult) throw new Error('Signing failed: ' + (signResult as any).error);
-    
-    const signedTxXdr = typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
-    if (!signedTxXdr) throw new Error('Signing failed - no signature returned');
+    const tx = new TransactionBuilder(account, {
+      fee: '1000000',
+      networkPassphrase: NETWORK_PASSPHRASE,
+    })
+      .addOperation(
+    quizContract.call(
+          'create_quiz',
+          Address.fromString(userAddress).toScVal(),
+          nativeToScVal(item.id, { type: 'u32' }),
+          nativeToScVal(item.text, { type: 'string' }),
+          nativeToScVal(item.correctAnswer, { type: 'string' })
+        )
+      )
+      .setTimeout(30)
+      .build();
 
-    const result = await server.sendTransaction(TransactionBuilder.fromXDR(signedTxXdr, NETWORK_PASSPHRASE));
+    let prepared;
+    try {
+      prepared = await server.prepareTransaction(tx);
+    } catch (e: any) {
+      alert('Seeding failed: ' + e.message);
+      return;
+    }
+
+    const signResult = await signTransaction(prepared.toXDR(), { network: 'TESTNET' });
+    if (typeof signResult === 'object' && signResult !== null && 'error' in signResult) {
+      throw new Error('Signing failed: ' + (signResult as any).error);
+    }
+    const signedXdr =
+      typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
+    if (!signedXdr) throw new Error('Signing failed - no signature returned');
+
+    const sent = await server.sendTransaction(TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE));
+    console.log(`[seed] Q${item.id} submitted: ${(sent as any).hash}`);
     
-    // Poll using raw HTTP to bypass SDK XDR parsing bug
-    let finalStatus = 'NOT_FOUND';
-    for (let i = 0; i < 30; i++) {
-      try {
-        const rpcRes = await fetch(RPC_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getTransaction', params: { hash: result.hash } })
-        });
-        const json = await rpcRes.json();
-        const status = json.result?.status || 'NOT_FOUND';
-        if (status === 'SUCCESS' || status === 'FAILED') {
-          finalStatus = status;
-          break;
-        }
-      } catch (e) {}
+    // WAIT for transaction to confirm before sending next one to avoid bad sequence errors
+    let confirmed = false;
+    for (let j = 0; j < 30; j++) {
+      const res = await fetch(RPC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0', id: 1,
+          method: 'getTransaction',
+          params: { hash: (sent as any).hash }
+        }),
+      });
+      const json = await res.json();
+      if (json.result?.status === 'SUCCESS') {
+        confirmed = true;
+        break;
+      }
+      if (json.result?.status === 'FAILED') {
+        throw new Error(`Transaction for Q${item.id} FAILED on-chain.`);
+      }
       await new Promise(r => setTimeout(r, 2000));
     }
+    if (!confirmed) throw new Error(`Timeout waiting for Q${item.id}`);
   }
 }

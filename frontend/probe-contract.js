@@ -1,66 +1,56 @@
-// Examine contract storage - check if questions are actually seeded
-import {
-  rpc,
-  Contract,
-  Networks,
-  nativeToScVal,
-  TransactionBuilder,
-  BASE_FEE,
-  scValToNative,
-} from '@stellar/stellar-sdk';
-
+// Check what functions are available on the deployed contract
 const CONTRACT_ID = 'CCATST7MXGZQWB6HQCHDLUKUZA6MVK4KIGCDFVQ34COE543GTINOK3BL';
-const DUMMY_PK = 'GBBIG4HLPGTLG6BH6YREVWJXEQ4NX74HTD444JD6A6XYS7DOFL2J6DEI';
-const server = new rpc.Server('https://soroban-testnet.stellar.org');
-const contract = new Contract(CONTRACT_ID);
+const RPC_URL = 'https://soroban-testnet.stellar.org';
 
-async function test() {
-  const account = await server.getAccount(DUMMY_PK);
-
-  // Try get_question(1) to see if question 1 is seeded
-  console.log('\n--- Testing get_question(1) ---');
-  try {
-    const tx = new TransactionBuilder(account, { fee: BASE_FEE, networkPassphrase: Networks.TESTNET })
-      .addOperation(contract.call('get_question', nativeToScVal(1, { type: 'u32' })))
-      .setTimeout(30).build();
-    const sim = await server.simulateTransaction(tx);
-    if (sim.error) {
-      console.log('get_question FAILED:', sim.error);
-    } else {
-      const val = scValToNative(sim.result.retval);
-      console.log('✅ Question 1 exists:', val);
+async function getContractInfo() {
+  // Get the contract's WASM hash from its ledger entry
+  const res = await fetch(RPC_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0', id: 1,
+      method: 'getLedgerEntries',
+      params: {
+        keys: [
+          // ContractData entry for the contract itself
+          Buffer.from(
+            (await import('@stellar/stellar-sdk')).then ? '' : ''
+          ).toString('base64')
+        ]
+      }
+    })
+  });
+  
+  // Instead, let's just try calling each possible function and see which exist
+  const { rpc, Networks, TransactionBuilder, BASE_FEE, Contract, nativeToScVal, Address } = await import('@stellar/stellar-sdk');
+  const server = new rpc.Server(RPC_URL);
+  const contract = new Contract(CONTRACT_ID);
+  
+  const dummyPK = 'GBBIG4HLPGTLG6BH6YREVWJXEQ4NX74HTD444JD6A6XYS7DOFL2J6DEI';
+  const account = await server.getAccount(dummyPK);
+  
+  const functions = ['create_quiz', 'add_question', 'submit_answer', 'get_question', 'get_score', 'get_total_quizzes', 'get_quiz_count'];
+  
+  console.log('Testing which functions exist on the contract...\n');
+  for (const fn of functions) {
+    try {
+      const tx = new TransactionBuilder(account, { fee: BASE_FEE, networkPassphrase: Networks.TESTNET })
+        .addOperation(contract.call(fn, nativeToScVal(1, { type: 'u32' })))
+        .setTimeout(30).build();
+      const result = await server.simulateTransaction(tx);
+      if (rpc.Api.isSimulationSuccess(result)) {
+        console.log(`✅ ${fn} — EXISTS and works`);
+      } else {
+        console.log(`⚠️  ${fn} — EXISTS but errored:`, result.error);
+      }
+    } catch (e) {
+      if (e.message.includes('non-existent')) {
+        console.log(`❌ ${fn} — DOES NOT EXIST`);
+      } else {
+        console.log(`⚠️  ${fn} — EXISTS but errored: ${e.message.split('\n')[0]}`);
+      }
     }
-  } catch(e) { console.error('get_question threw:', e.message); }
-
-  // Try get_score to see what param type it takes
-  console.log('\n--- Testing get_score with string param ---');
-  try {
-    const tx2 = new TransactionBuilder(account, { fee: BASE_FEE, networkPassphrase: Networks.TESTNET })
-      .addOperation(contract.call('get_score', nativeToScVal(DUMMY_PK, { type: 'string' })))
-      .setTimeout(30).build();
-    const sim2 = await server.simulateTransaction(tx2);
-    if (sim2.error) {
-      console.log('get_score (string) FAILED:', sim2.error);
-    } else {
-      console.log('✅ get_score (string) worked:', scValToNative(sim2.result.retval));
-    }
-  } catch(e) { console.error('get_score threw:', e.message); }
-
-  // Also try get_score with i32 (address type)
-  console.log('\n--- Testing get_score with address param ---');
-  const { Address, nativeToScVal: nts } = await import('@stellar/stellar-sdk');
-  try {
-    const addr = Address.fromString(DUMMY_PK).toScVal();
-    const tx3 = new TransactionBuilder(account, { fee: BASE_FEE, networkPassphrase: Networks.TESTNET })
-      .addOperation(contract.call('get_score', addr))
-      .setTimeout(30).build();
-    const sim3 = await server.simulateTransaction(tx3);
-    if (sim3.error) {
-      console.log('get_score (address) FAILED:', sim3.error);
-    } else {
-      console.log('✅ get_score (address) worked:', scValToNative(sim3.result.retval));
-    }
-  } catch(e) { console.error('get_score (address) threw:', e.message); }
+  }
 }
 
-test().catch(console.error);
+getContractInfo().catch(console.error);

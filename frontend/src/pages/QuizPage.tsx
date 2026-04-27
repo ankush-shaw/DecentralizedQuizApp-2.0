@@ -41,8 +41,7 @@ export function QuizPage({
   const [error, setError] = useState<string | null>(null);
   const [answeredIds, setAnsweredIds] = useState<Set<number>>(new Set());
   const [onChainCount, setOnChainCount] = useState(0);
-  const [isEmpty, setIsEmpty] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
+
   const [questions] = useState<Question[]>(() => 
     shuffleArray(QUIZ_QUESTIONS.slice(0, 15)).slice(0, 5).map(q => ({
       ...q,
@@ -50,26 +49,9 @@ export function QuizPage({
     }))
   );
 
-  useEffect(() => {
-    async function checkState() {
-      const count = await getTotalQuizzes();
-      setIsEmpty(count === 0);
-    }
-    checkState();
-  }, []);
 
-  const handleSeedFromPage = async () => {
-    if (!userAddress) return;
-    setIsSeeding(true);
-    try {
-      await initializeContract(userAddress);
-      setIsEmpty(false);
-    } catch (e) {
-      console.error('Seeding failed:', e);
-    } finally {
-      setIsSeeding(false);
-    }
-  };
+
+
   const [accountStatus, setAccountStatus] = useState<AccountStatus>('checking');
 
   const currentQuestion = questions[currentIndex];
@@ -192,31 +174,7 @@ export function QuizPage({
         </div>
       </nav>
 
-      {/* On-Chain Empty State Warning */}
-      {isEmpty && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl bg-amber-900/50 border border-amber-500/50 p-4 rounded-xl flex items-center justify-between backdrop-blur-sm z-50"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-500/20 rounded-lg">
-              <Database className="w-5 h-5 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-amber-200 text-sm font-medium">Contract is Empty</p>
-              <p className="text-amber-200/60 text-xs">On-chain data must be seeded for logic to work.</p>
-            </div>
-          </div>
-          <button
-            onClick={handleSeedFromPage}
-            disabled={isSeeding}
-            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 text-sm font-bold rounded-lg transition-colors"
-          >
-            {isSeeding ? 'Seeding...' : 'Seed Now'}
-          </button>
-        </motion.div>
-      )}
+
 
       {/* Account funding banner */}
       <AnimatePresence>

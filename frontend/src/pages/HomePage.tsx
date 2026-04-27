@@ -14,7 +14,7 @@ interface HomePageProps {
 
 export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onInitialize }: HomePageProps) {
   const [totalQuizzes, setTotalQuizzes] = useState<number | null>(null);
-  const [isInitializing, setIsInitializing] = useState(false);
+
 
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
 
@@ -33,19 +33,7 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
     checkCount();
   }, [wallet.isConnected]);
 
-  const handleInit = async () => {
-    setIsInitializing(true);
-    try {
-      if (!wallet.address) return;
-      await onInitialize();
-      const count = await getTotalQuizzes();
-      setTotalQuizzes(count);
-    } catch (e) {
-      console.error('Initialization failed:', e);
-    } finally {
-      setIsInitializing(false);
-    }
-  };
+
 
   const features = [
     { icon: Brain, title: 'On-Chain Questions', desc: 'All questions stored immutably on Stellar Soroban.' },
@@ -91,7 +79,7 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                 >
                   <div className="flex items-center gap-3">
                     <button onClick={onStartQuiz} className="btn-primary group">
-                      {totalQuizzes === 0 ? 'Wait for Data...' : 'Start Quiz'}
+                      Start Quiz
                       <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </button>
                     <button onClick={onDisconnect} className="btn-ghost text-sm">
@@ -99,38 +87,7 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                     </button>
                   </div>
                   
-                  {totalQuizzes === 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-5 rounded-2xl glass border-brand-500/30 bg-brand-500/10 max-w-sm mt-4"
-                    >
-                      <div className="flex items-center gap-2 text-brand-400 mb-2 font-bold justify-center">
-                        <Database size={16} />
-                        <span>Contract is Empty</span>
-                      </div>
-                      <p className="text-xs text-slate-400 mb-4 px-2">
-                        This contract has no quizzes yet. Click below to seed it with 5 initial questions using your wallet.
-                      </p>
-                      <button
-                        onClick={handleInit}
-                        disabled={isInitializing}
-                        className="btn-primary w-full justify-center text-sm py-2 bg-brand-600 hover:bg-brand-500"
-                      >
-                        {isInitializing ? (
-                          <>
-                            <Loader2 size={16} className="animate-spin" />
-                            Initializing...
-                          </>
-                        ) : (
-                          <>
-                            <Rocket size={16} />
-                            Seed On-Chain Data
-                          </>
-                        )}
-                      </button>
-                    </motion.div>
-                  )}
+
 
                   <div className="text-sm text-slate-500 font-mono">
                     {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}

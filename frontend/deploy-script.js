@@ -14,7 +14,7 @@ import path from 'path';
 
 const RPC_URL = 'https://soroban-testnet.stellar.org';
 const NETWORK_PASSPHRASE = Networks.TESTNET;
-const WASM_PATH = '../target/wasm32-unknown-unknown/release/hello_world.wasm'; // Check path
+const WASM_PATH = '../target/wasm32-unknown-unknown/release/quiz_contract.wasm'; // Check path
 
 const server = new rpc.Server(RPC_URL);
 
@@ -36,7 +36,7 @@ async function deploy() {
   // 1. Upload WASM
   console.log('Uploading WASM...');
   // Note: We need to find the correct path
-  const wasmPath = path.resolve('..', 'target', 'wasm32v1-none', 'release', 'hello_world.wasm');
+  const wasmPath = path.resolve('..', 'target', 'wasm32-unknown-unknown', 'release', 'quiz_contract.wasm');
   const wasm = fs.readFileSync(wasmPath);
 
   let tx = new TransactionBuilder(account, {

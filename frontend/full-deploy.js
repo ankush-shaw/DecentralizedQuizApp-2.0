@@ -16,7 +16,7 @@ import path from 'path';
 
 const RPC_URL = 'https://soroban-testnet.stellar.org';
 const NETWORK_PASSPHRASE = Networks.TESTNET;
-const WASM_PATH = '../target/wasm32v1-none/release/hello_world.wasm';
+const WASM_PATH = '../target/wasm32-unknown-unknown/release/quiz_contract.wasm';
 
 const server = new rpc.Server(RPC_URL);
 
