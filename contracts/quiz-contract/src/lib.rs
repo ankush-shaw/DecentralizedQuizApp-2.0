@@ -71,8 +71,14 @@ impl QuizContract {
                 .unwrap_or(Map::new(&env));
 
             let current = scores.get(solver.clone()).unwrap_or(0);
-            scores.set(solver, current + 1);
+            scores.set(solver.clone(), current + 1);
             env.storage().instance().set(&SCORES_KEY, &scores);
+
+            // Emit event for Level 4 advanced requirement
+            env.events().publish(
+                (symbol_short!("quiz_ans"), solver),
+                id
+            );
             true
         } else {
             false
