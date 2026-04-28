@@ -1,0 +1,28 @@
+name: Stellar Smart Contract CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install Stellar CLI
+        run: |
+          curl -sSfL https://release.stellar.org/stellar-cli/install.sh | sh
+          echo "$HOME/.stellar-cli/bin" >> $GITHUB_PATH
+
+      - name: Build Contract
+        run: |
+          cd contracts/quiz-contract
+          cargo build --target wasm32-unknown-unknown --release

@@ -82,6 +82,11 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                       Start Quiz
                       <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </button>
+                    {(!totalQuizzes || totalQuizzes === 0) && (
+                      <button onClick={onInitialize} className="btn-ghost text-sm border border-white/10">
+                        Initialize Contract
+                      </button>
+                    )}
                     <button onClick={onDisconnect} className="btn-ghost text-sm">
                       Disconnect
                     </button>

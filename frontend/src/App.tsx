@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useWallet } from './hooks/useWallet';
-import { submitAnswer, initializeContract } from './services/soroban';
+import { submitAnswer, initializeContract, submitBatchAnswers } from './services/soroban';
 import { HomePage } from './pages/HomePage';
 import { QuizPage } from './pages/QuizPage';
 import { ResultPage } from './pages/ResultPage';
@@ -26,16 +26,17 @@ function App() {
     setPage('quiz');
   };
 
-  const handleSubmitAnswer = useCallback(
-    async (questionId: number, answer: string): Promise<boolean | null> => {
-      if (!wallet.address) return null;
-      // Try to submit on-chain; catches errors gracefully
+
+
+  const handleBatchSubmit = useCallback(
+    async (answers: { id: number; answer: string }[]): Promise<boolean> => {
+      if (!wallet.address) return false;
       try {
-        const result = await submitAnswer(wallet.address, questionId, answer);
-        return result;
-      } catch {
-        // If Freighter is not available or user rejects, return null (UI handles this)
-        return null;
+        const result = await submitBatchAnswers(wallet.address, answers);
+        return result !== null;
+      } catch (e) {
+        console.error('Batch submit failed:', e);
+        return false;
       }
     },
     [wallet.address]
@@ -98,7 +99,7 @@ function App() {
             >
               <QuizPage
                 userAddress={wallet.address ?? ''}
-                onSubmitAnswer={handleSubmitAnswer}
+                onBatchSubmit={handleBatchSubmit}
                 onComplete={handleQuizComplete}
                 onBack={() => setPage('home')}
                 onConnectWallet={connect}
@@ -118,6 +119,7 @@ function App() {
                 total={outcome.total}
                 address={wallet.address}
                 onPlayAgain={handlePlayAgain}
+                onHome={() => setPage('home')}
               />
             </motion.div>
           )}

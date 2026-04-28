@@ -20,37 +20,33 @@ function shuffleArray<T>(array: T[]): T[] {
 
 interface QuizPageProps {
   userAddress: string;
-  onSubmitAnswer: (qId: number, answer: string) => Promise<boolean | null>;
+  onBatchSubmit: (answers: { id: number; answer: string }[]) => Promise<boolean>;
   onComplete: (score: number, total: number) => void;
   onBack: () => void;
   onConnectWallet: () => void;
 }
 
-type AccountStatus = 'checking' | 'funded' | 'unfunded';
-
 export function QuizPage({
   userAddress,
-  onSubmitAnswer,
+  onBatchSubmit,
   onComplete,
   onBack,
   onConnectWallet,
 }: QuizPageProps) {
+  const [isPaid, setIsPaid] = useState(false);
+  const [isPaying, setIsPaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [results, setResults] = useState<Record<number, QuizResult>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [answeredIds, setAnsweredIds] = useState<Set<number>>(new Set());
-  const [onChainCount, setOnChainCount] = useState(0);
 
   const [questions] = useState<Question[]>(() => 
-    shuffleArray(QUIZ_QUESTIONS.slice(0, 15)).slice(0, 5).map(q => ({
+    shuffleArray(QUIZ_QUESTIONS.slice(0, 15)).slice(0, 10).map(q => ({
       ...q,
       options: shuffleArray(q.options)
     }))
   );
-
-
-
 
   const [accountStatus, setAccountStatus] = useState<AccountStatus>('checking');
 
@@ -82,99 +78,72 @@ export function QuizPage({
           <button onClick={onBack} className="btn-ghost text-sm">
             <ArrowLeft size={16} /> Back
           </button>
-        </nav>
-        <div className="flex-1 flex items-center justify-center px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="glass p-10 max-w-md w-full text-center"
-          >
-            <div className="p-4 rounded-full bg-brand-500/20 inline-flex mb-4">
-              <Wallet size={36} className="text-brand-400" />
-            </div>
-            <h2 className="text-2xl font-bold mb-3">Wallet Required</h2>
-            <p className="text-slate-400 mb-6 leading-relaxed">
-              Connect your <strong className="text-white">Freighter wallet</strong> before playing.
-              Each answer requires your on-chain signature.
-            </p>
-            <button onClick={onConnectWallet} className="btn-primary w-full justify-center">
-              <Wallet size={18} /> Connect Wallet
-            </button>
-            <p className="mt-4 text-xs text-slate-500">
-              Don't have Freighter?{' '}
-              <a href="https://freighter.app" target="_blank" rel="noreferrer" className="text-brand-400 underline">
-                Install it here
-              </a>
-            </p>
-          </motion.div>
+          <button onClick={onBack} className="btn-ghost text-sm">Cancel</button>
         </div>
       </div>
     );
   }
 
-  // ── Answer handler ─────────────────────────────────────────────────────────
-  const handleAnswer = async (answer: string) => {
-    if (answeredIds.has(currentQuestion.id) || isSubmitting) return;
+  // ── Answer handler (Local only for UX) ──────────────────────────────────────
+  const handleAnswer = (answer: string) => {
+    if (answeredIds.has(currentQuestion.id)) return;
 
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const result = await onSubmitAnswer(currentQuestion.id, answer);
-      const isOnChain = result !== null;
-      const correct = answer === currentQuestion.correctAnswer;
-
-      if (isOnChain) {
-        setOnChainCount((c) => c + 1);
-        // If it worked, mark account as funded (in case we didn't know)
-        setAccountStatus('funded');
-      } else {
-        setError('Transaction failed — answer not recorded on-chain.');
-      }
-
-      setResults((prev) => ({
-        ...prev,
-        [currentQuestion.id]: { questionId: currentQuestion.id, userAnswer: answer, correct },
-      }));
-      setAnsweredIds((prev) => new Set([...prev, currentQuestion.id]));
-    } catch {
-      setError('Transaction error. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    const correct = answer === currentQuestion.correctAnswer;
+    setResults((prev) => ({
+      ...prev,
+      [currentQuestion.id]: { questionId: currentQuestion.id, userAnswer: answer, correct },
+    }));
+    setAnsweredIds((prev) => new Set([...prev, currentQuestion.id]));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setError(null);
     if (isLastQuestion) {
-      const score = Object.values(results).filter((r) => r.correct).length;
-      onComplete(score, questions.length);
+      setIsSubmitting(true);
+      try {
+        // Collect all answers from state
+        const allAnswers = questions.map(q => ({
+          id: q.id,
+          answer: results[q.id]?.userAnswer || ''
+        }));
+
+        console.log("Submitting batch of", allAnswers.length, "answers...");
+        const success = await onBatchSubmit(allAnswers);
+        
+        if (success) {
+          const score = Object.values(results).filter((r) => r.correct).length;
+          onComplete(score, questions.length);
+        } else {
+          setError('Failed to save score on-chain. Please check your wallet and try again.');
+        }
+      } catch (err) {
+        setError('Transaction failed. Make sure you have enough testnet XLM.');
+      } finally {
+        setIsSubmitting(false);
+      }
     } else {
       setCurrentIndex((prev) => prev + 1);
     }
   };
 
-  const canProceed = answeredIds.has(currentQuestion.id) && !isSubmitting;
+  const canProceed = answeredIds.has(currentQuestion.id);
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-5 border-b border-white/5">
         <button onClick={onBack} className="btn-ghost text-sm">
           <ArrowLeft size={16} /> Back to Home
         </button>
         <div className="flex items-center gap-3">
-          <div className="glass px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs">
-            <Link size={12} className="text-green-400" />
-            <span className="text-slate-400">{onChainCount}/{answeredIds.size} on-chain</span>
+           <div className="glass px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs">
+            <Database size={12} className="text-brand-400" />
+            <span className="text-slate-400">On-chain mode enabled</span>
           </div>
           <span className="text-sm font-mono text-brand-400">
             {userAddress.slice(0, 6)}…{userAddress.slice(-4)}
           </span>
         </div>
       </nav>
-
-
 
       {/* Account funding banner */}
       <AnimatePresence>
@@ -188,7 +157,7 @@ export function QuizPage({
             <div className="flex items-center gap-2 text-amber-400 text-sm">
               <AlertTriangle size={16} />
               <span>
-                <strong>Testnet account not funded.</strong> Answers can't be submitted on-chain yet.
+                <strong>Testnet account not funded.</strong> You'll need some test XLM to save your results.
               </span>
             </div>
             <a
@@ -198,24 +167,12 @@ export function QuizPage({
               onClick={() => setTimeout(() => setAccountStatus('funded'), 5000)}
               className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
             >
-              Fund with Friendbot (free) <ExternalLink size={12} />
+              Fund with Friendbot <ExternalLink size={12} />
             </a>
-          </motion.div>
-        )}
-        {accountStatus === 'funded' && onChainCount === 0 && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="bg-green-500/10 border-b border-green-500/30 px-6 py-3 flex items-center gap-2 text-green-400 text-sm"
-          >
-            <CheckCircle2 size={16} />
-            <span>Account funded ✓ — Freighter will ask you to sign each answer transaction.</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Quiz */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         <AnimatePresence mode="wait">
           <QuestionCard
@@ -224,7 +181,7 @@ export function QuizPage({
             currentIndex={currentIndex}
             total={questions.length}
             result={results[currentQuestion.id] ?? null}
-            isSubmitting={isSubmitting}
+            isSubmitting={false}
             alreadyAnswered={answeredIds.has(currentQuestion.id)}
             onAnswer={handleAnswer}
           />
@@ -239,11 +196,26 @@ export function QuizPage({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.02 }}
+            disabled={isSubmitting}
             onClick={handleNext}
-            className="btn-primary mt-6"
+            className="btn-primary mt-6 min-w-[200px] justify-center"
           >
-            {isLastQuestion ? 'View Results' : 'Next Question'}
-            <ArrowRight size={18} />
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin" size={18} />
+                Saving to Ledger...
+              </>
+            ) : isLastQuestion ? (
+              <>
+                Save Results & Finish
+                <ArrowRight size={18} />
+              </>
+            ) : (
+              <>
+                Next Question
+                <ArrowRight size={18} />
+              </>
+            )}
           </motion.button>
         )}
       </main>
