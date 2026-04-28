@@ -216,36 +216,4 @@ Contributions are welcome! If you'd like to improve the contract logic or fronte
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-## 👥 User Feedback & Validation
-
-To ensure the MVP meets real-world needs, we collected feedback from **5+ unique users** on the Stellar Testnet.
-
-### 📝 Feedback Collection
-*   **Google Form:** [Submit Feedback Here](https://forms.gle/igDFFfURB9HXRL2H8)
-*   **Responses:** [Link to your exported Excel sheet here]
-
-### 📊 User Wallet Addresses (Verifiable)
-1. `GA...` (Placeholder - replace with real users)
-2. `GB...`
-3. `GC...`
-4. `GD...`
-5. `GE...`
-
----
-
-### 🔄 Iterative Improvements (Phase 1)
-Based on the initial user feedback, the following iteration was implemented:
-
-| Feedback | Improvement Made | Git Commit Link |
-|:---|:---|:---|
-| *"I want a way to directly give feedback from the app"* | Added a dedicated "Submit Feedback" button in the footer. | [Commit Link Here] |
-
-### 🔮 Next Phase Roadmap (Phase 2)
-Based on collected data, we plan the following evolutions:
-1. **Global Leaderboard:** Implementing a contract-based leaderboard to track the top 10 players globally.
-2. **Timed Challenges:** Introducing a countdown timer for each question to increase difficulty.
-3. **Reward Distribution:** Auto-sending 1 XLM to users who score 100% on the quiz.
-
----
-
 <p align="center">Built with ❤️ on Stellar</p>
