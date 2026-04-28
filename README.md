@@ -3,8 +3,16 @@
 [![Stellar](https://img.shields.io/badge/Network-Stellar-blue?style=for-the-badge&logo=stellar)](https://stellar.org)
 [![Soroban](https://img.shields.io/badge/Standard-Soroban-green?style=for-the-badge&logo=rust)](https://soroban.stellar.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![CI/CD](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/actions/workflows/ci.yml/badge.svg)](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/actions)
 
-A transparent, tamper-proof quiz platform built on the **Stellar Network** using **Soroban** smart contracts. This dApp ensures fairness by storing questions, evaluating answers, and tracking scores entirely on-chain.
+A transparent, tamper-proof quiz platform built on the **Stellar Network** using **Soroban** smart contracts.
+
+### 📱 Mobile Responsive View
+The app is fully optimized for mobile devices (tested on iPhone 14 / 390px viewport).
+<p align="center">
+  <img width="300" alt="Mobile View" src="https://github.com/ankush-shaw/DecentralizedQuizApp/blob/main/frontend/public/mobile-screenshot.png?raw=true" />
+</p>
+
 
 ---
 
