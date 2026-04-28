@@ -40,10 +40,10 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
 
-      - name: Install Soroban CLI
-        run: cargo install --locked soroban-cli
-
-      - name: Build Contract
+      - name: Build Contract (WASM)
         run: |
           cd contracts/quiz-contract
-          stellar contract build
+          cargo build --target wasm32-unknown-unknown --release
+
+      - name: Verify WASM exists
+        run: ls -l target/wasm32-unknown-unknown/release/*.wasm
