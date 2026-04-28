@@ -19,10 +19,10 @@ import { requestAccess, signTransaction } from '@stellar/freighter-api';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-export const CONTRACT_ID = 'CCN42P4LRUSG426R5WAOCAIX3WSZG2T7Y3YHFETN3F4JY3NM7OINJRAD';
+export const CONTRACT_ID = 'CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E';
 export const NETWORK_PASSPHRASE = Networks.TESTNET;
 export const RPC_URL = 'https://soroban-testnet.stellar.org';
-export const NATIVE_TOKEN = 'CAS3J7GYCCXG7Y3I7A6OTNWD5YEMVFD6P6HKDCDOED2CUEV7V5KWD7DY';
+export const NATIVE_TOKEN = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';
 
 /**
  * Pay the entry fee for the quiz (1 XLM)
@@ -75,9 +75,10 @@ export async function payEntryFee(userAddress: string): Promise<boolean> {
       await new Promise(r => setTimeout(r, 2000));
     }
     return false;
-  } catch (e) {
+  } catch (e: any) {
     console.error('Entry fee payment failed:', e);
-    return false;
+    // Return a more descriptive error if possible
+    throw new Error(e.message || 'Payment failed. Please check your XLM balance and try again.');
   }
 }
 

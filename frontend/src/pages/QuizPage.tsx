@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Loader2, Wallet, Link, AlertTriangle, ExternalLink, CheckCircle2, Database } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, Wallet, Coins, AlertCircle, CheckCircle2, Database } from 'lucide-react';
 import { QuestionCard } from '../components/QuestionCard';
-import { submitAnswer, getTotalQuizzes, initializeContract } from '../services/soroban';
+import { submitAnswer, getTotalQuizzes, initializeContract, payEntryFee } from '../services/soroban';
 import type { Question, QuizResult } from '../types';
 import quizData from '../data/questions.json';
 
@@ -48,37 +48,84 @@ export function QuizPage({
     }))
   );
 
-  const [accountStatus, setAccountStatus] = useState<AccountStatus>('checking');
-
   const currentQuestion = questions[currentIndex];
   const isLastQuestion = currentIndex === questions.length - 1;
-  const friendbotUrl = `https://friendbot.stellar.org/?addr=${userAddress}`;
 
-  // ── Check if account is funded on testnet ──────────────────────────────────
-  useEffect(() => {
-    if (!userAddress) return;
-    const checkAccount = async () => {
-      try {
-        const res = await fetch(
-          `https://horizon-testnet.stellar.org/accounts/${userAddress}`
-        );
-        setAccountStatus(res.ok ? 'funded' : 'unfunded');
-      } catch {
-        setAccountStatus('unfunded');
+  const handlePay = async () => {
+    setIsPaying(true);
+    setError(null);
+    try {
+      const success = await payEntryFee(userAddress);
+      if (success) {
+        setIsPaid(true);
+      } else {
+        setError('Transaction timed out or failed on-chain.');
       }
-    };
-    checkAccount();
-  }, [userAddress]);
+    } catch (e: any) {
+      setError(e.message || 'Payment failed. Please check your balance.');
+    } finally {
+      setIsPaying(false);
+    }
+  };
 
   // ── Wallet gate ─────────────────────────────────────────────────────────────
   if (!userAddress) {
     return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center glass m-6">
+        <Wallet className="w-16 h-16 text-brand-400 mb-6" />
+        <h2 className="text-2xl font-bold mb-4">Wallet Required</h2>
+        <p className="text-slate-400 mb-8 max-w-sm">Please connect your wallet to participate in the decentralized quiz.</p>
+        <button onClick={onConnectWallet} className="btn-primary">Connect Wallet</button>
+      </div>
+    );
+  }
+
+  // ── Payment gate ────────────────────────────────────────────────────────────
+  if (!isPaid) {
+    return (
       <div className="min-h-screen flex flex-col">
         <nav className="flex items-center px-6 py-5 border-b border-white/5">
-          <button onClick={onBack} className="btn-ghost text-sm">
+          <button onClick={onBack} className="btn-ghost text-sm flex items-center gap-2">
             <ArrowLeft size={16} /> Back
           </button>
-          <button onClick={onBack} className="btn-ghost text-sm">Cancel</button>
+        </nav>
+        <div className="flex-1 flex items-center justify-center p-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass p-10 max-w-md w-full text-center"
+          >
+            <div className="w-20 h-20 rounded-full bg-brand-500/10 flex items-center justify-center mb-8 mx-auto">
+              <Coins className="w-10 h-10 text-brand-400" />
+            </div>
+            <h2 className="text-3xl font-black mb-4">Entry Fee</h2>
+            <p className="text-slate-400 mb-8 leading-relaxed">
+              To play this quiz, a small entry fee of <span className="text-white font-bold">1.0 XLM</span> is required. 
+              This is a secure <span className="text-brand-400">inter-contract call</span> on the Stellar network.
+            </p>
+            
+            {error && (
+              <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center gap-3">
+                <AlertCircle size={20} />
+                <p className="text-sm font-medium">{error}</p>
+              </div>
+            )}
+
+            <button 
+              onClick={handlePay} 
+              disabled={isPaying}
+              className="btn-primary w-full justify-center"
+            >
+              {isPaying ? (
+                <>
+                  <Loader2 className="animate-spin" size={20} />
+                  Processing...
+                </>
+              ) : (
+                'Pay 1.0 XLM & Start'
+              )}
+            </button>
+          </motion.div>
         </div>
       </div>
     );
@@ -101,23 +148,21 @@ export function QuizPage({
     if (isLastQuestion) {
       setIsSubmitting(true);
       try {
-        // Collect all answers from state
         const allAnswers = questions.map(q => ({
           id: q.id,
           answer: results[q.id]?.userAnswer || ''
         }));
 
-        console.log("Submitting batch of", allAnswers.length, "answers...");
         const success = await onBatchSubmit(allAnswers);
         
         if (success) {
           const score = Object.values(results).filter((r) => r.correct).length;
           onComplete(score, questions.length);
         } else {
-          setError('Failed to save score on-chain. Please check your wallet and try again.');
+          setError('Failed to save score on-chain. Please check your wallet.');
         }
       } catch (err) {
-        setError('Transaction failed. Make sure you have enough testnet XLM.');
+        setError('Transaction failed.');
       } finally {
         setIsSubmitting(false);
       }
@@ -126,8 +171,6 @@ export function QuizPage({
     }
   };
 
-  const canProceed = answeredIds.has(currentQuestion.id);
-
   return (
     <div className="min-h-screen flex flex-col">
       <nav className="flex items-center justify-between px-6 py-5 border-b border-white/5">
@@ -135,90 +178,77 @@ export function QuizPage({
           <ArrowLeft size={16} /> Back to Home
         </button>
         <div className="flex items-center gap-3">
-           <div className="glass px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs">
-            <Database size={12} className="text-brand-400" />
-            <span className="text-slate-400">On-chain mode enabled</span>
-          </div>
           <span className="text-sm font-mono text-brand-400">
             {userAddress.slice(0, 6)}…{userAddress.slice(-4)}
           </span>
         </div>
       </nav>
 
-      {/* Account funding banner */}
-      <AnimatePresence>
-        {accountStatus === 'unfunded' && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="bg-amber-500/10 border-b border-amber-500/30 px-6 py-3 flex items-center justify-between gap-4 flex-wrap"
-          >
-            <div className="flex items-center gap-2 text-amber-400 text-sm">
-              <AlertTriangle size={16} />
-              <span>
-                <strong>Testnet account not funded.</strong> You'll need some test XLM to save your results.
-              </span>
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-2xl">
+          <div className="flex justify-between items-center mb-8">
+            <span className="text-slate-500 text-sm font-medium">Question {currentIndex + 1} of {questions.length}</span>
+            <div className="flex gap-1">
+              {questions.map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`h-1.5 w-8 rounded-full transition-colors ${
+                    i === currentIndex ? 'bg-brand-400' : i < currentIndex ? 'bg-brand-400/30' : 'bg-white/5'
+                  }`}
+                />
+              ))}
             </div>
-            <a
-              href={friendbotUrl}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => setTimeout(() => setAccountStatus('funded'), 5000)}
-              className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentIndex}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
             >
-              Fund with Friendbot <ExternalLink size={12} />
-            </a>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <QuestionCard
+                question={currentQuestion}
+                onAnswer={handleAnswer}
+                selectedAnswer={results[currentQuestion.id]?.userAnswer}
+                disabled={isSubmitting}
+              />
+            </motion.div>
+          </AnimatePresence>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-        <AnimatePresence mode="wait">
-          <QuestionCard
-            key={currentIndex}
-            question={currentQuestion}
-            currentIndex={currentIndex}
-            total={questions.length}
-            result={results[currentQuestion.id] ?? null}
-            isSubmitting={false}
-            alreadyAnswered={answeredIds.has(currentQuestion.id)}
-            onAnswer={handleAnswer}
-          />
-        </AnimatePresence>
-
-        {error && (
-          <p className="mt-4 text-amber-400 text-sm text-center max-w-sm">{error}</p>
-        )}
-
-        {canProceed && (
-          <motion.button
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.02 }}
-            disabled={isSubmitting}
-            onClick={handleNext}
-            className="btn-primary mt-6 min-w-[200px] justify-center"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="animate-spin" size={18} />
-                Saving to Ledger...
-              </>
-            ) : isLastQuestion ? (
-              <>
-                Save Results & Finish
-                <ArrowRight size={18} />
-              </>
-            ) : (
-              <>
-                Next Question
-                <ArrowRight size={18} />
-              </>
+          <div className="mt-10 flex justify-between items-center">
+            {error && (
+              <div className="flex items-center gap-2 text-red-400 text-sm">
+                <AlertCircle size={16} />
+                <span>{error}</span>
+              </div>
             )}
-          </motion.button>
-        )}
-      </main>
+            <div className="flex-1" />
+            <button
+              onClick={handleNext}
+              disabled={!answeredIds.has(currentQuestion.id) || isSubmitting}
+              className="btn-primary"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="animate-spin" size={20} />
+                  Saving Score...
+                </>
+              ) : isLastQuestion ? (
+                <>
+                  Save Results & Finish
+                  <ArrowRight size={20} />
+                </>
+              ) : (
+                <>
+                  Next Question
+                  <ArrowRight size={20} />
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -16,10 +16,10 @@ A transparent, tamper-proof quiz platform built on the **Stellar Network** using
 |:---|:---|
 | **Live Demo** | [https://decentralized-quiz-app.vercel.app/](https://decentralized-quiz-app.vercel.app/) |
 | **Demo Video** | [Watch on Google Drive](https://drive.google.com/file/d/1xVaxKEJJ9BJ7o1c8achWptP0uXBA5Jd_/view?usp=sharing) |
-| **Contract ID** | `CCN42P4LRUSG426R5WAOCAIX3WSZG2T7Y3YHFETN3F4JY3NM7OINJRAD` |
+| **Contract ID** | `CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E` |
 | **Network** | Stellar Testnet |
 | **Deployment Tx Hash** | [Check latest tx on explorer] |
-| **Explorer** | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CCN42P4LRUSG426R5WAOCAIX3WSZG2T7Y3YHFETN3F4JY3NM7OINJRAD) |
+| **Explorer** | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E) |
 | **Token / Pool** | N/A — quiz scoring handled entirely on-chain via contract state |
 | **Commits** | 8+ meaningful commits (see git log) |
 
@@ -117,11 +117,11 @@ The application interacts with the **Stellar Testnet**. Read-only operations lik
 
 ## 🔗 Deployment Details
 
-- **Contract ID:** `CCN42P4LRUSG426R5WAOCAIX3WSZG2T7Y3YHFETN3F4JY3NM7OINJRAD`
+- **Contract ID:** `CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E`
 - **Network:** Stellar Testnet
 - **Deployment Transaction Hash:** [Check latest tx on explorer]
-- **Explorer:** [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CCN42P4LRUSG426R5WAOCAIX3WSZG2T7Y3YHFETN3F4JY3NM7OINJRAD)
-- **Stellar Lab:** [Interact via Laboratory](https://lab.stellar.org/r/testnet/contract/CCN42P4LRUSG426R5WAOCAIX3WSZG2T7Y3YHFETN3F4JY3NM7OINJRAD)
+- **Explorer:** [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E)
+- **Stellar Lab:** [Interact via Laboratory](https://lab.stellar.org/r/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E)
 
 ---
 

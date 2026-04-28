@@ -1,52 +1,21 @@
-import { motion } from 'framer-motion';
-import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
-import type { Question, QuizResult } from '../types';
+import { CheckCircle2 } from 'lucide-react';
+import type { Question } from '../types';
 
 interface QuestionCardProps {
   question: Question;
-  currentIndex: number;
-  total: number;
-  result: QuizResult | null;
-  isSubmitting: boolean;
-  alreadyAnswered: boolean;
   onAnswer: (answer: string) => void;
+  selectedAnswer?: string;
+  disabled?: boolean;
 }
 
 export function QuestionCard({
   question,
-  currentIndex,
-  total,
-  result,
-  isSubmitting,
-  alreadyAnswered,
   onAnswer,
+  selectedAnswer,
+  disabled,
 }: QuestionCardProps) {
   return (
-    <motion.div
-      key={question.id}
-      initial={{ opacity: 0, x: 40 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -40 }}
-      transition={{ duration: 0.3 }}
-      className="glass p-8 max-w-2xl mx-auto w-full"
-    >
-      {/* Progress */}
-      <div className="flex justify-between items-center mb-6">
-        <span className="text-sm text-slate-400 font-medium">
-          Question {currentIndex + 1} of {total}
-        </span>
-        <div className="flex gap-1">
-          {Array.from({ length: total }).map((_, i) => (
-            <div
-              key={i}
-              className={`h-1 w-8 rounded-full transition-all ${
-                i <= currentIndex ? 'bg-brand-500' : 'bg-white/10'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-
+    <div className="glass p-8 w-full max-w-2xl mx-auto">
       {/* Question Text */}
       <h2 className="text-xl font-bold text-slate-100 mb-8 leading-relaxed">
         {question.text}
@@ -55,53 +24,31 @@ export function QuestionCard({
       {/* Answer Options */}
       <div className="space-y-3">
         {question.options.map((option) => {
-          let className = 'answer-option';
-
-          if (result) {
-          if (option === question.correctAnswer) {
-              className += ' answer-correct';
-            } else if (option === result.userAnswer && !result.correct) {
-              className += ' answer-wrong';
-            }
+          const isSelected = option === selectedAnswer;
+          
+          let className = 'answer-option transition-all duration-200 w-full text-left p-4 rounded-xl border flex items-center justify-between group';
+          
+          if (isSelected) {
+            className += ' border-brand-400 bg-brand-400/10 text-brand-400';
+          } else {
+            className += ' border-white/5 bg-white/5 hover:bg-white/10 text-slate-300 hover:border-white/20';
           }
 
           return (
-            <motion.button
+            <button
               key={option}
-              whileHover={!result && !alreadyAnswered ? { scale: 1.01 } : {}}
-              whileTap={!result && !alreadyAnswered ? { scale: 0.99 } : {}}
-              onClick={() => !result && !alreadyAnswered && !isSubmitting && onAnswer(option)}
-              disabled={!!result || alreadyAnswered || isSubmitting}
+              onClick={() => !disabled && onAnswer(option)}
+              disabled={disabled}
               className={className}
             >
-              <span className="flex items-center justify-between">
-                <span>{option}</span>
-                {result && option === question.correctAnswer && (
-                  <CheckCircle2 size={20} className="text-green-400" />
-                )}
-                {result && option === result.userAnswer && !result.correct && (
-                  <XCircle size={20} className="text-red-400" />
-                )}
-              </span>
-            </motion.button>
+              <span className="font-medium">{option}</span>
+              {isSelected && (
+                <CheckCircle2 size={20} className="text-brand-400" />
+              )}
+            </button>
           );
         })}
       </div>
-
-      {/* Submitting indicator */}
-      {isSubmitting && (
-        <div className="mt-6 flex items-center justify-center gap-2 text-brand-400">
-          <Loader2 size={18} className="animate-spin" />
-          <span className="text-sm font-medium">Submitting answer to chain…</span>
-        </div>
-      )}
-
-      {/* Already answered warning */}
-      {alreadyAnswered && !result && (
-        <p className="mt-4 text-center text-sm text-amber-400">
-          You've already answered this question.
-        </p>
-      )}
-    </motion.div>
+    </div>
   );
 }
