@@ -16,6 +16,7 @@ import {
 } from '@stellar/stellar-sdk';
 import quizData from '../data/questions.json';
 import { requestAccess, signTransaction } from '@stellar/freighter-api';
+import albedo from '@albedo-link/intent';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -51,9 +52,17 @@ export async function payEntryFee(userAddress: string): Promise<boolean> {
       .build();
 
     const prepared = await server.prepareTransaction(tx);
-    const signResult = await signTransaction(prepared.toXDR(), { network: 'TESTNET' });
     
-    const signedXdr = typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
+    let signedXdr: string | null = null;
+    const isAlbedo = localStorage.getItem('walletType') === 'albedo';
+
+    if (isAlbedo) {
+      signedXdr = await signWithAlbedo(prepared.toXDR());
+    } else {
+      const signResult = await signTransaction(prepared.toXDR(), { network: 'TESTNET' });
+      signedXdr = typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
+    }
+
     if (!signedXdr) return false;
 
     const sent = await server.sendTransaction(TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE));
@@ -90,10 +99,17 @@ console.log('--- DECENTRALIZED QUIZ APP v3.0.0 ---');
 // ─── Wallet ────────────────────────────────────────────────────────────────────
 
 /**
- * Connect to the Freighter wallet and return the user's public key
+ * Connect to a wallet (Freighter or Albedo) and return the user's public key
  */
-export async function connectWallet(): Promise<string | null> {
+export async function connectWallet(type: 'freighter' | 'albedo' = 'freighter'): Promise<string | null> {
   try {
+    if (type === 'albedo') {
+      const res = await albedo.publicKey({
+        token: 'quiz-app-' + Math.random(),
+      });
+      return res.pubkey;
+    }
+
     const result = await requestAccess();
     if (typeof result === 'string') return result || null;
     if (result && typeof result === 'object' && 'address' in result) {
@@ -107,15 +123,43 @@ export async function connectWallet(): Promise<string | null> {
 }
 
 /**
- * Check if Freighter is installed.
+ * Check if the specified wallet is installed/available.
  */
-export function isFreighterInstalled(): boolean {
+export function isWalletInstalled(type: 'freighter' | 'albedo'): boolean {
   if (typeof window === 'undefined') return false;
+  if (type === 'albedo') return true; // Albedo is a web-based popup
   return (
     'freighterApi' in window ||
     'freighter' in window ||
     (typeof (window as any).__freighter !== 'undefined')
   );
+}
+
+/**
+ * Internal helper to sign with Albedo
+ */
+async function signWithAlbedo(xdr: string): Promise<string | null> {
+  try {
+    const res = await albedo.tx({ xdr, network: 'testnet' });
+    return res.signed_envelope_xdr;
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
+ * Fetches the XLM balance for a given address from Horizon
+ */
+export async function getXlmBalance(address: string): Promise<string | null> {
+  try {
+    const response = await fetch(`https://horizon-testnet.stellar.org/accounts/${address}`);
+    if (!response.ok) return '0.00';
+    const data = await response.json();
+    const nativeBalance = data.balances.find((b: any) => b.asset_type === 'native');
+    return nativeBalance ? parseFloat(nativeBalance.balance).toFixed(2) : '0.00';
+  } catch (e) {
+    return null;
+  }
 }
 
 // ─── Read Functions ───────────────────────────────────────────────────────────
@@ -231,18 +275,23 @@ export async function submitAnswer(
       return null;
     }
 
-    console.log('[submitAnswer] Requesting Freighter signature...');
-    const signResult = await signTransaction(prepared.toXDR(), { network: 'TESTNET' });
+    console.log('[submitAnswer] Requesting signature...');
+    let signedXdr: string | null = null;
+    const isAlbedo = localStorage.getItem('walletType') === 'albedo';
 
-    if (typeof signResult === 'object' && signResult !== null && 'error' in signResult) {
-      console.error('[submitAnswer] Freighter error:', (signResult as any).error);
-      return null;
+    if (isAlbedo) {
+      signedXdr = await signWithAlbedo(prepared.toXDR());
+    } else {
+      const signResult = await signTransaction(prepared.toXDR(), { network: 'TESTNET' });
+      if (typeof signResult === 'object' && signResult !== null && 'error' in signResult) {
+        console.error('[submitAnswer] Freighter error:', (signResult as any).error);
+        return null;
+      }
+      signedXdr = typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
     }
 
-    const signedXdr =
-      typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
     if (!signedXdr) {
-      console.error('[submitAnswer] Empty signature from Freighter');
+      console.error('[submitAnswer] Empty signature');
       return null;
     }
 
@@ -324,13 +373,20 @@ export async function submitBatchAnswers(
       alert('Transaction simulation failed: ' + e.message + '\n\nTry refreshing the page and ensuring your wallet is funded.');
       return null;
     }
-    const signResult = await signTransaction(prepared.toXDR(), { network: 'TESTNET' });
+    console.log('[submitBatchAnswers] Requesting signature...');
+    let signedXdr: string | null = null;
+    const isAlbedo = localStorage.getItem('walletType') === 'albedo';
 
-    if (typeof signResult === 'object' && signResult !== null && 'error' in signResult) {
-      return null;
+    if (isAlbedo) {
+      signedXdr = await signWithAlbedo(prepared.toXDR());
+    } else {
+      const signResult = await signTransaction(prepared.toXDR(), { network: 'TESTNET' });
+      if (typeof signResult === 'object' && signResult !== null && 'error' in signResult) {
+        return null;
+      }
+      signedXdr = typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
     }
 
-    const signedXdr = typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
     if (!signedXdr) return null;
 
     const sent = await server.sendTransaction(TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE));
@@ -404,11 +460,20 @@ export async function initializeContract(userAddress: string): Promise<void> {
       return;
     }
 
-    const signResult = await signTransaction(prepared.toXDR(), { network: 'TESTNET' });
-    if (typeof signResult === 'object' && signResult !== null && 'error' in signResult) {
-      throw new Error('Signing failed: ' + (signResult as any).error);
+    console.log('[seed] Requesting signature...');
+    let signedXdr: string | null = null;
+    const isAlbedo = localStorage.getItem('walletType') === 'albedo';
+
+    if (isAlbedo) {
+      signedXdr = await signWithAlbedo(prepared.toXDR());
+    } else {
+      const signResult = await signTransaction(prepared.toXDR(), { network: 'TESTNET' });
+      if (typeof signResult === 'object' && signResult !== null && 'error' in signResult) {
+        throw new Error('Signing failed: ' + (signResult as any).error);
+      }
+      signedXdr = typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
     }
-    const signedXdr = typeof signResult === 'string' ? signResult : (signResult as any)?.signedTxXdr;
+
     if (!signedXdr) throw new Error('Signing failed - no signature');
 
     const sent = await server.sendTransaction(TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE));

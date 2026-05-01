@@ -6,7 +6,7 @@ import { getTotalQuizzes, CONTRACT_ID } from '../services/soroban';
 
 interface HomePageProps {
   wallet: WalletState;
-  onConnect: () => void;
+  onConnect: (type: 'freighter' | 'albedo') => void;
   onDisconnect: () => void;
   onStartQuiz: () => void;
   onInitialize: () => Promise<void>;
@@ -93,25 +93,66 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                   </div>
                   
 
-
-                  <div className="text-sm text-slate-500 font-mono">
-                    {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="flex items-center gap-2">
+                      {wallet.balance && (
+                        <div className="px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 text-xs">
+                          {wallet.balance} XLM
+                        </div>
+                      )}
+                      <div className="text-sm text-slate-500 font-mono">
+                        {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
+                      </div>
+                    </div>
+                    
+                    {(wallet.balance === '0.00' || !wallet.balance || parseFloat(wallet.balance) < 1) && (
+                      <button 
+                        onClick={async () => {
+                          try {
+                            const res = await fetch(`https://friendbot.stellar.org?addr=${wallet.address}`);
+                            if (res.ok) {
+                              alert('Success! Account funded. Please refresh the page to see your balance.');
+                            }
+                          } catch (e) {
+                            alert('Friendbot busy. Try again in a moment.');
+                          }
+                        }}
+                        className="text-[10px] text-brand-400 hover:underline mt-1"
+                      >
+                        New account? Click to Fund with Friendbot
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               ) : (
-                <motion.button
-                  key="connect"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onConnect}
-                  className="btn-primary"
-                >
-                  <Wallet size={20} />
-                  Connect Wallet
-                </motion.button>
+                <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md mx-auto">
+                  <motion.button
+                    key="connect-freighter"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => onConnect('freighter')}
+                    className="btn-primary flex-1 justify-center"
+                    disabled={wallet.isConnecting}
+                  >
+                    <Wallet size={20} />
+                    {wallet.isConnecting ? 'Connecting...' : 'Freighter'}
+                  </motion.button>
+                  <motion.button
+                    key="connect-albedo"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => onConnect('albedo')}
+                    className="btn-ghost flex-1 justify-center border border-white/10 hover:bg-white/5"
+                    disabled={wallet.isConnecting}
+                  >
+                    <Rocket size={20} />
+                    {wallet.isConnecting ? 'Connecting...' : 'Albedo'}
+                  </motion.button>
+                </div>
               )}
             </AnimatePresence>
           </div>

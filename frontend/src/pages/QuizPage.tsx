@@ -23,7 +23,7 @@ interface QuizPageProps {
   onBatchSubmit: (answers: { id: number; answer: string }[]) => Promise<boolean>;
   onComplete: (score: number, total: number) => void;
   onBack: () => void;
-  onConnectWallet: () => void;
+  onConnectWallet: (type: 'freighter' | 'albedo') => void;
 }
 
 export function QuizPage({
@@ -75,7 +75,10 @@ export function QuizPage({
         <Wallet className="w-16 h-16 text-brand-400 mb-6" />
         <h2 className="text-2xl font-bold mb-4">Wallet Required</h2>
         <p className="text-slate-400 mb-8 max-w-sm">Please connect your wallet to participate in the decentralized quiz.</p>
-        <button onClick={onConnectWallet} className="btn-primary">Connect Wallet</button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs mx-auto">
+          <button onClick={() => onConnectWallet('freighter')} className="btn-primary flex-1 justify-center">Freighter</button>
+          <button onClick={() => onConnectWallet('albedo')} className="btn-ghost flex-1 justify-center border border-white/10">Albedo</button>
+        </div>
       </div>
     );
   }

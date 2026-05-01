@@ -20,7 +20,7 @@ function App() {
 
   const handleStartQuiz = () => {
     if (!wallet.isConnected) {
-      connect();
+      connect('freighter');
       return;
     }
     setPage('quiz');

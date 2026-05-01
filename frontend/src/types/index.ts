@@ -21,6 +21,7 @@ export interface LeaderboardEntry {
 
 export type WalletState = {
   address: string | null;
+  balance: string | null;
   isConnecting: boolean;
   isConnected: boolean;
   error: string | null;

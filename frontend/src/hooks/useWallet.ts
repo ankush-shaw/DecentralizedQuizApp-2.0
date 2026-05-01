@@ -1,56 +1,64 @@
 import { useState, useCallback } from 'react';
-import { connectWallet, isFreighterInstalled } from '../services/soroban';
+import { connectWallet, isWalletInstalled, getXlmBalance } from '../services/soroban';
 import type { WalletState } from '../types';
 
 /**
- * Custom hook for managing Freighter wallet state
+ * Custom hook for managing multi-wallet state (Freighter/Albedo)
  */
 export function useWallet() {
   const [wallet, setWallet] = useState<WalletState>({
     address: null,
+    balance: null,
     isConnecting: false,
     isConnected: false,
     error: null,
   });
 
-  const connect = useCallback(async () => {
+  const connect = useCallback(async (type: 'freighter' | 'albedo' = 'freighter') => {
     setWallet((prev) => ({ ...prev, isConnecting: true, error: null }));
 
     try {
-      const address = await connectWallet();
+      const address = await connectWallet(type);
 
       if (address) {
+        localStorage.setItem('walletType', type);
+        const balance = await getXlmBalance(address);
         setWallet({
           address,
+          balance,
           isConnecting: false,
           isConnected: true,
           error: null,
         });
       } else {
         // connectWallet returned null — could be rejection or not installed
-        const notInstalled = !isFreighterInstalled();
+        const notInstalled = !isWalletInstalled(type);
         setWallet({
           address: null,
+          balance: null,
           isConnecting: false,
           isConnected: false,
           error: notInstalled
-            ? 'Freighter is not installed. Get it at freighter.app'
-            : 'Connection rejected. Please approve the request in Freighter.',
+            ? `${type.charAt(0).toUpperCase() + type.slice(1)} is not available. Please install it.`
+            : 'Connection rejected. Please approve the request in your wallet.',
         });
       }
     } catch {
       setWallet({
         address: null,
+        balance: null,
         isConnecting: false,
         isConnected: false,
-        error: 'Failed to connect. Is Freighter installed and on Testnet?',
+        error: `Failed to connect to ${type}.`,
       });
     }
   }, []);
 
   const disconnect = useCallback(() => {
+    localStorage.removeItem('walletType');
     setWallet({
       address: null,
+      balance: null,
       isConnecting: false,
       isConnected: false,
       error: null,
@@ -59,3 +67,4 @@ export function useWallet() {
 
   return { wallet, connect, disconnect };
 }
+
