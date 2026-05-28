@@ -15,7 +15,7 @@ A transparent, tamper-proof quiz platform built on the **Stellar Network** using
 | Item | Value |
 |:---|:---|
 | **Live Demo** | [https://decentralized-quiz-app.vercel.app/](https://decentralized-quiz-app.vercel.app/) |
-| **Demo Video** | [Watch on Google Drive](https://drive.google.com/file/d/1YIKcC3aNbyTlFm08_Dpa1TB6pa4qe0n_/view?usp=sharing) |
+| **Demo Video** | [Watch on Google Drive](https://drive.google.com/file/d/1YIKcC3aNbyTlFm08_Dpa1TB6pa4qe0n-/view?usp=sharing) |
 | **Contract ID** | `CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E` |
 | **Network** | Stellar Testnet |
 | **Deployment Tx Hash** | [Check latest tx on explorer] |
@@ -64,7 +64,7 @@ Based on our testers' feedback, we successfully completed two major development 
 ## 📱 Mobile Responsive View
 
 <p align="center">
- <img width="273" height="585" alt="image" src="https://github.com/user-attachments/assets/57e9d851-b0f0-47cf-b493-cb7ee3971e6e" />
+ <img width="269" height="589" alt="image" src="https://github.com/user-attachments/assets/148168ef-ba80-4fcd-b7d9-45dbd9fff78b" />
 
   <br>
   <em>Fully responsive layout on mobile (390px viewport — iPhone 14)</em>
