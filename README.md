@@ -29,7 +29,7 @@ A transparent, tamper-proof quiz platform built on the **Stellar Network** using
 
 We successfully onboarded **5+ real testers** to validate our MVP and gathered feedback via a structured onboarding flow.
 
-*   **📋 Onboarding Form:** [Google Form Link]([https://forms.google.com](https://docs.google.com/forms/d/e/1FAIpQLSf3TzKaOfjUOjPoOs1GxBsWHffOcSvpCE4P23wp3Z8KtpvGug/viewform?usp=dialog)) 
+*   **📋 Onboarding Form:** [Google Form Link](https://docs.google.com/forms/d/e/1FAIpQLSf3TzKaOfjUOjPoOs1GxBsWHffOcSvpCE4P23wp3Z8KtpvGug/viewform?usp=dialog)
 *   **📊 Live Feedback Database:** [View Exported Excel/Google Sheet](https://docs.google.com/spreadsheets/d/1yzhNNOGW3jdu_NlA66nkLDk33kJdPJpqGtNDMwmVtCE/edit?usp=sharing)
 
 ### 📊 Verified Testers (5+ Wallet Addresses)
