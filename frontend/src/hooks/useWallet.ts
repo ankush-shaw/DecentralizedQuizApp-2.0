@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
 import { connectWallet, isWalletInstalled, getXlmBalance } from '../services/soroban';
+import type { WalletType } from '../services/soroban';
 import type { WalletState } from '../types';
 
 /**
- * Custom hook for managing multi-wallet state (Freighter/Albedo)
+ * Custom hook for managing multi-wallet state (Freighter / Albedo / xBull / Hana)
  */
 export function useWallet() {
   const [wallet, setWallet] = useState<WalletState>({
@@ -14,7 +15,7 @@ export function useWallet() {
     error: null,
   });
 
-  const connect = useCallback(async (type: 'freighter' | 'albedo' = 'freighter') => {
+  const connect = useCallback(async (type: WalletType = 'freighter') => {
     setWallet((prev) => ({ ...prev, isConnecting: true, error: null }));
 
     try {
@@ -31,15 +32,15 @@ export function useWallet() {
           error: null,
         });
       } else {
-        // connectWallet returned null — could be rejection or not installed
         const notInstalled = !isWalletInstalled(type);
+        const label = type === 'xbull' ? 'xBull' : type === 'hana' ? 'Hana' : type.charAt(0).toUpperCase() + type.slice(1);
         setWallet({
           address: null,
           balance: null,
           isConnecting: false,
           isConnected: false,
           error: notInstalled
-            ? `${type.charAt(0).toUpperCase() + type.slice(1)} is not available. Please install it.`
+            ? `${label} Wallet is not installed. Please install it first.`
             : 'Connection rejected. Please approve the request in your wallet.',
         });
       }
@@ -67,4 +68,5 @@ export function useWallet() {
 
   return { wallet, connect, disconnect };
 }
+
 

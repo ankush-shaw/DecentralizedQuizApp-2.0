@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wallet, Rocket, ChevronRight, Github, ExternalLink, Database, Shield, Brain, Layers } from 'lucide-react';
+import { ChevronRight, Github, ExternalLink, Shield, Brain, Layers } from 'lucide-react';
 import type { WalletState } from '../types';
 import { getTotalQuizzes, CONTRACT_ID } from '../services/soroban';
+import type { WalletType } from '../services/soroban';
 
 interface HomePageProps {
   wallet: WalletState;
-  onConnect: (type: 'freighter' | 'albedo') => void;
+  onConnect: (type: WalletType) => void;
   onDisconnect: () => void;
   onStartQuiz: () => void;
   onInitialize: () => Promise<void>;
@@ -125,34 +126,84 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                   </div>
                 </motion.div>
               ) : (
-                <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md mx-auto">
-                  <motion.button
-                    key="connect-freighter"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => onConnect('freighter')}
-                    className="btn-primary flex-1 justify-center"
-                    disabled={wallet.isConnecting}
-                  >
-                    <Wallet size={20} />
-                    {wallet.isConnecting ? 'Connecting...' : 'Freighter'}
-                  </motion.button>
-                  <motion.button
-                    key="connect-albedo"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => onConnect('albedo')}
-                    className="btn-ghost flex-1 justify-center border border-white/10 hover:bg-white/5"
-                    disabled={wallet.isConnecting}
-                  >
-                    <Rocket size={20} />
-                    {wallet.isConnecting ? 'Connecting...' : 'Albedo'}
-                  </motion.button>
-                </div>
+                <>
+                  <div className="grid grid-cols-2 gap-3 w-full max-w-sm mx-auto">
+                    {/* Freighter */}
+                    <motion.button
+                      key="connect-freighter"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.05 }}
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => onConnect('freighter')}
+                      className="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-brand-500/10 border border-brand-500/25 text-brand-300 hover:bg-brand-500/20 hover:border-brand-400/50 transition-all disabled:opacity-50"
+                      disabled={wallet.isConnecting}
+                      id="btn-connect-freighter"
+                    >
+                      <span className="text-2xl">🚀</span>
+                      <span className="text-sm font-semibold">Freighter</span>
+                    </motion.button>
+
+                    {/* Albedo */}
+                    <motion.button
+                      key="connect-albedo"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => onConnect('albedo')}
+                      className="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-purple-500/10 border border-purple-500/25 text-purple-300 hover:bg-purple-500/20 hover:border-purple-400/50 transition-all disabled:opacity-50"
+                      disabled={wallet.isConnecting}
+                      id="btn-connect-albedo"
+                    >
+                      <span className="text-2xl">🌐</span>
+                      <span className="text-sm font-semibold">Albedo</span>
+                    </motion.button>
+
+                    {/* xBull */}
+                    <motion.button
+                      key="connect-xbull"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.15 }}
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => onConnect('xbull')}
+                      className="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-300 hover:bg-amber-500/20 hover:border-amber-400/50 transition-all disabled:opacity-50"
+                      disabled={wallet.isConnecting}
+                      id="btn-connect-xbull"
+                    >
+                      <span className="text-2xl">🐂</span>
+                      <span className="text-sm font-semibold">xBull</span>
+                    </motion.button>
+
+                    {/* Hana */}
+                    <motion.button
+                      key="connect-hana"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => onConnect('hana')}
+                      className="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-pink-500/10 border border-pink-500/25 text-pink-300 hover:bg-pink-500/20 hover:border-pink-400/50 transition-all disabled:opacity-50"
+                      disabled={wallet.isConnecting}
+                      id="btn-connect-hana"
+                    >
+                      <span className="text-2xl">🌸</span>
+                      <span className="text-sm font-semibold">Hana</span>
+                    </motion.button>
+                  </div>
+
+                  {wallet.error && (
+                    <p className="text-red-400 text-xs mt-2 text-center max-w-xs">{wallet.error}</p>
+                  )}
+                  {wallet.isConnecting && (
+                    <p className="text-brand-400 text-xs mt-2 text-center animate-pulse">Connecting...</p>
+                  )}
+                </>
               )}
             </AnimatePresence>
           </div>

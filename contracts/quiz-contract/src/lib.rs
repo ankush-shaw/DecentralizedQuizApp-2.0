@@ -67,3 +67,6 @@ impl QuizContract {
         correct
     }
 }
+
+#[cfg(test)]
+mod test;

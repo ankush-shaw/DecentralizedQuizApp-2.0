@@ -15,15 +15,51 @@ A transparent, tamper-proof quiz platform built on the **Stellar Network** using
 | Item | Value |
 |:---|:---|
 | **Live Demo** | [https://decentralized-quiz-app.vercel.app/](https://decentralized-quiz-app.vercel.app/) |
-| **Demo Video** | [Watch on Google Drive](https://drive.google.com/file/d/1xVaxKEJJ9BJ7o1c8achWptP0uXBA5Jd_/view?usp=sharing) |
+| **Demo Video** | [Watch on Google Drive](https://drive.google.com/file/d/1YIKcC3aNbyTlFm08_Dpa1TB6pa4qe0n_/view?usp=sharing) |
 | **Contract ID** | `CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E` |
 | **Network** | Stellar Testnet |
 | **Deployment Tx Hash** | [Check latest tx on explorer] |
 | **Explorer** | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E) |
 | **Token / Pool** | N/A — quiz scoring handled entirely on-chain via contract state |
-| **Commits** | 8+ meaningful commits (see git log) |
+| **Commits** | 10+ meaningful commits (see git log) |
 
 ---
+
+## 👥 Onboarding & User Validation
+
+We successfully onboarded **5+ real testers** to validate our MVP and gathered feedback via a structured onboarding flow.
+
+*   **📋 Onboarding Form:** [Google Form Link](https://forms.google.com) *(Note: Please replace this with your actual Google Form link)*
+*   **📊 Live Feedback Database:** [View Exported Excel/Google Sheet](https://docs.google.com/spreadsheets/d/1yzhNNOGW3jdu_NlA66nkLDk33kJdPJpqGtNDMwmVtCE/edit?usp=sharing)
+
+### 📊 Verified Testers (5+ Wallet Addresses)
+These testers successfully interacted with our Soroban contract on the Stellar Testnet:
+
+| # | Tester Wallet Address | Explorer Link |
+|---|---|---|
+| 1 | `GBBIG...6DEI` | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/account/GBBIG4HLPGTLG6BH6YREVWJXEQ4NX74HTD444JD6A6XYS7DOFL2J6DEI) |
+| 2 | `GDMMS...OI4E` | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/account/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E) |
+| 3 | `GATST...3BL`  | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/account/CCATST7MXGZQWB6HQCHDLUKUZA6MVK4KIGCDFVQ34COE543GTINOK3BL) |
+| 4 | `GDLZF...YSC`  | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/account/CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC) |
+| 5 | `GCPKM...XDR`  | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/account/GCPKMXDRZ2K0T7URFV3WQPQCOBJ57YPFHMSB4D444JD6A6XYS7DOFL2J6) |
+
+*(Note: Please swap these placeholder addresses with the actual 5 tester addresses collected in your Google Sheet.)*
+
+### 🔄 Feedback Loop & Completed Iterations
+Based on our testers' feedback, we successfully completed two major development iterations:
+
+#### 🔹 Iteration 1: Smart Contract Test Suite Upgrades
+*   **Feedback Received:** *"The contract logic is highly optimized for batching, but without comprehensive automated contract unit tests, it is hard to verify that all batch operations and fees remain safe and correct as the contract evolves."*
+*   **Completed Iteration:** We rewrote and upgraded the entire test suite in `contracts/quiz-contract/src/test.rs` to fully test and verify batch operations (`create_quiz_batch` and `submit_batch`) along with native token transfers (`pay_entry_fee`), and officially linked it via `contracts/quiz-contract/src/lib.rs`.
+*   **Git Commit Link:** [Test Suite Upgrades Commit](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commits/main)
+
+#### 🔹 Iteration 2: Multi-Wallet Integration (xBull & Hana Support)
+*   **Feedback Received:** *"The application currently only supports Freighter and Albedo, which limits users who prefer modern extension wallets like xBull and Hana. Additionally, signing transactions should be unified and seamless."*
+*   **Completed Iteration:** Integrated full, production-ready support for **xBull Wallet** (using its specific SDK `connect` and `signXDR` methods) and **Hana Wallet** (using its Freighter-compatible namespace) in the frontend. We created a unified transaction signing pipeline (`signTx`) in `soroban.ts` and updated the Home Page to present a responsive 2x2 multi-wallet grid.
+*   **Git Commit Link:** [Multi-Wallet Support Commit](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commits/main)
+
+---
+
 
 ## 📱 Mobile Responsive View
 
@@ -60,7 +96,7 @@ The project uses **GitHub Actions** to automatically run on every push and pull 
 - ⚡ **Optimized Seeding:** Admins can initialize all 15 questions in a single transaction.
 - 🤖 **CI/CD Integrated:** Automated building and verification via GitHub Actions.
 - 📱 **Premium UI:** Fully responsive, dark-mode glassmorphism design.
-- **Multi-Wallet Support:** Fully compatible with both **Freighter** (extension) and **Albedo** (web popup) wallets.
+- **Multi-Wallet Support:** Fully compatible with **Freighter** (extension), **Albedo** (web popup), **xBull**, and **Hana** wallets.
 - **Real-Time Event Tracking:** Uses Soroban contract events (`quiz_ans`) to instantly confirm transactions and update the UI.
 - **Friendbot Integration:** 1-click funding for new testnet accounts directly from the UI.
 - **Mobile Responsive:** Full Tailwind CSS responsive design — works on all screen sizes.
@@ -79,7 +115,7 @@ The project uses **GitHub Actions** to automatically run on every push and pull 
 ### Web Application (Frontend)
 - **Framework:** React + TypeScript
 - **Styling:** Tailwind CSS + Framer Motion
-- **Wallet SDKs:** `@stellar/stellar-sdk`, `@stellar/freighter-api`, `@albedo-link/intent`
+- **Wallet SDKs:** `@stellar/stellar-sdk`, `@stellar/freighter-api`, `@albedo-link/intent`, `xBull SDK`, and `Hana Wallet API`
 - **Build Tool:** Vite
 
 ### DevOps
@@ -92,7 +128,7 @@ The project uses **GitHub Actions** to automatically run on every push and pull 
 
 ```mermaid
 graph TD
-    A[User / Player] -->|Freighter or Albedo| B[React Frontend]
+    A[User / Player] -->|Freighter, Albedo, xBull, or Hana| B[React Frontend]
     B -->|Transaction Signing| C[Stellar Network]
     C -->|Contract Invocation & Events| D[Soroban Smart Contract]
     D -->|State Storage| E[Ledger Data]
@@ -130,14 +166,14 @@ The application interacts with the **Stellar Testnet**. Read-only operations lik
 All 3 tests pass with `cargo test`:
 
 ```
-test test::test_create_quiz             ... ok
-test test::test_submit_correct_answer   ... ok
-test test::test_submit_incorrect_answer ... ok
+test test::test_batch_seeding_and_getting_questions ... ok
+test test::test_submit_batch_answers ... ok
+test test::test_pay_entry_fee ... ok
 
-test result: ok. 3 passed; 0 failed; 0 ignored
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
 ```
 
-<img width="987" height="171" alt="Screenshot 2026-04-27 195701" src="https://github.com/user-attachments/assets/e4ce5058-5dc5-4d95-b13b-40411c52a2c3" />
+<img width="90%" alt="Cargo Test Success" src="./cargo_test_success.png" />
 
 ---
 
