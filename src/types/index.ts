@@ -28,3 +28,24 @@ export type WalletState = {
 };
 
 export type QuizState = 'idle' | 'loading' | 'active' | 'submitting' | 'complete' | 'error';
+
+// ─── Transaction Status ───────────────────────────────────────────────────────
+/** Tracks the lifecycle of a Soroban transaction submitted from the frontend */
+export type TxStatusState = 'idle' | 'pending' | 'success' | 'failed';
+
+export interface TxStatus {
+  state: TxStatusState;
+  hash: string | null;
+  error: string | null;
+  /** Name of the contract function being called */
+  functionName: string | null;
+}
+
+// ─── Contract Event ────────────────────────────────────────────────────────
+/** Represents a quiz_ans contract event emitted by the Soroban contract */
+export interface QuizEvent {
+  questionId: number;
+  solver: string;
+  timestamp: number;
+}
+

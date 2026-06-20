@@ -1,10 +1,13 @@
 import { useState, useCallback } from 'react';
-import { connectWallet, isWalletInstalled, getXlmBalance } from '../services/soroban';
+import { connectWallet, getXlmBalance } from '../services/soroban';
+import { WalletNotInstalledError, TransactionRejectedError } from '../services/errors';
 import type { WalletType } from '../services/soroban';
 import type { WalletState } from '../types';
 
 /**
  * Custom hook for managing multi-wallet state (Freighter / Albedo / xBull / Hana)
+ *
+ * Level 2: Handles WalletNotInstalledError and TransactionRejectedError distinctly.
  */
 export function useWallet() {
   const [wallet, setWallet] = useState<WalletState>({
@@ -32,25 +35,36 @@ export function useWallet() {
           error: null,
         });
       } else {
-        const notInstalled = !isWalletInstalled(type);
-        const label = type === 'xbull' ? 'xBull' : type === 'hana' ? 'Hana' : type.charAt(0).toUpperCase() + type.slice(1);
+        // connectWallet returned null without throwing — treat as rejection
         setWallet({
           address: null,
           balance: null,
           isConnecting: false,
           isConnected: false,
-          error: notInstalled
-            ? `${label} Wallet is not installed. Please install it first.`
-            : 'Connection rejected. Please approve the request in your wallet.',
+          error: 'Connection returned no address. Please try again.',
         });
       }
-    } catch {
+    } catch (e: unknown) {
+      // ── Handle each named error type with a specific message ──────────────
+      let errorMessage: string;
+
+      if (e instanceof WalletNotInstalledError) {
+        // Error Type 1: Wallet extension not installed
+        errorMessage = e.message;
+      } else if (e instanceof TransactionRejectedError) {
+        // Error Type 2: User rejected/cancelled the connection
+        errorMessage = e.message;
+      } else {
+        // Fallback for unknown errors
+        errorMessage = `Failed to connect to ${type}. Please try again.`;
+      }
+
       setWallet({
         address: null,
         balance: null,
         isConnecting: false,
         isConnected: false,
-        error: `Failed to connect to ${type}.`,
+        error: errorMessage,
       });
     }
   }, []);
@@ -68,5 +82,3 @@ export function useWallet() {
 
   return { wallet, connect, disconnect };
 }
-
-
