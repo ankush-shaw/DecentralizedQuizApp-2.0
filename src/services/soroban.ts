@@ -362,6 +362,31 @@ export async function getScore(userAddress: string): Promise<number> {
   }
 }
 
+/**
+ * Fetch top 5 high scores on-chain from the contract leaderboard.
+ * Satisfies Level 3 Advanced Smart Contract state retrieval.
+ */
+export async function getLeaderboard(): Promise<{ address: string; score: number; rank: number }[]> {
+  try {
+    const res = await simulateCall('get_leaderboard', []);
+    if (!res || !Array.isArray(res)) return [];
+    
+    return res.map((entry: any, index: number) => {
+      // entry is a tuple/array [addressString, scoreU32]
+      const addr = entry[0] ? String(entry[0]) : 'Unknown';
+      const score = typeof entry[1] === 'number' ? entry[1] : Number(entry[1]);
+      return {
+        address: addr,
+        score,
+        rank: index + 1,
+      };
+    });
+  } catch (e) {
+    console.error('[getLeaderboard] Error:', e);
+    return [];
+  }
+}
+
 /** Helper for simulation (READ-only operations — no signing required) */
 async function simulateCall(funcName: string, args: any[]): Promise<any> {
   try {

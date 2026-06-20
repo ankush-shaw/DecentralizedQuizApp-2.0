@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Github, ExternalLink, Shield, Brain, Layers } from 'lucide-react';
 import type { WalletState } from '../types';
-import { getTotalQuizzes, CONTRACT_ID } from '../services/soroban';
+import { getTotalQuizzes, getLeaderboard, CONTRACT_ID } from '../services/soroban';
 import type { WalletType } from '../services/soroban';
+import { Leaderboard } from '../components/Leaderboard';
+import { LiveEventTicker } from '../components/LiveEventTicker';
 
 interface HomePageProps {
   wallet: WalletState;
@@ -15,8 +17,8 @@ interface HomePageProps {
 
 export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onInitialize }: HomePageProps) {
   const [totalQuizzes, setTotalQuizzes] = useState<number | null>(null);
-
-
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
 
   useEffect(() => {
@@ -31,7 +33,21 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
         setTotalQuizzes(null);
       }
     }
+    
+    async function fetchOnChainLeaderboard() {
+      setIsLoadingLeaderboard(true);
+      try {
+        const data = await getLeaderboard();
+        setLeaderboard(data);
+      } catch (e) {
+        console.error('Failed to fetch leaderboard:', e);
+      } finally {
+        setIsLoadingLeaderboard(false);
+      }
+    }
+
     checkCount();
+    fetchOnChainLeaderboard();
   }, [wallet.isConnected]);
 
 
@@ -209,8 +225,19 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
           </div>
         </motion.div>
 
+        {/* On-Chain Leaderboard & Live Event Stream */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto w-full"
+        >
+          <Leaderboard entries={leaderboard} isLoading={isLoadingLeaderboard} />
+          <LiveEventTicker />
+        </motion.div>
+
         {/* Features Grid */}
-        <div className="mt-32 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((f, i) => (
             <motion.div
               key={i}

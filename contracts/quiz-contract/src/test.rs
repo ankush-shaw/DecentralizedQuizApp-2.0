@@ -85,7 +85,70 @@ fn test_pay_entry_fee() {
     // Verify balances changed
     assert_eq!(token_client.balance(&player), 900);
     assert_eq!(token_client.balance(&contract_id), 100);
-
 }
 
+#[test]
+fn test_leaderboard_sorting() {
+    let env = Env::default();
+    env.mock_all_auths();
 
+    let contract_id = env.register(QuizContract, ());
+    let client = QuizContractClient::new(&env, &contract_id);
+
+    // Seed 5 questions
+    let batch = vec![
+        &env,
+        (1u32, String::from_str(&env, "Q1"), String::from_str(&env, "A")),
+        (2u32, String::from_str(&env, "Q2"), String::from_str(&env, "A")),
+        (3u32, String::from_str(&env, "Q3"), String::from_str(&env, "A")),
+        (4u32, String::from_str(&env, "Q4"), String::from_str(&env, "A")),
+        (5u32, String::from_str(&env, "Q5"), String::from_str(&env, "A")),
+    ];
+    client.create_quiz_batch(&batch);
+
+    // Generate 6 players (leaderboard limit is 5)
+    let p1 = Address::generate(&env);
+    let p2 = Address::generate(&env);
+    let p3 = Address::generate(&env);
+    let p4 = Address::generate(&env);
+    let p5 = Address::generate(&env);
+    let p6 = Address::generate(&env);
+
+    // Submit answers with different scores
+    // P1 gets 3/5
+    client.submit_batch(&p1, &vec![&env, (1, String::from_str(&env, "A")), (2, String::from_str(&env, "A")), (3, String::from_str(&env, "A"))]);
+    // P2 gets 5/5
+    client.submit_batch(&p2, &vec![&env, (1, String::from_str(&env, "A")), (2, String::from_str(&env, "A")), (3, String::from_str(&env, "A")), (4, String::from_str(&env, "A")), (5, String::from_str(&env, "A"))]);
+    // P3 gets 1/5
+    client.submit_batch(&p3, &vec![&env, (1, String::from_str(&env, "A"))]);
+    // P4 gets 4/5
+    client.submit_batch(&p4, &vec![&env, (1, String::from_str(&env, "A")), (2, String::from_str(&env, "A")), (3, String::from_str(&env, "A")), (4, String::from_str(&env, "A"))]);
+    // P5 gets 2/5
+    client.submit_batch(&p5, &vec![&env, (1, String::from_str(&env, "A")), (2, String::from_str(&env, "A"))]);
+    // P6 gets 4/5
+    client.submit_batch(&p6, &vec![&env, (1, String::from_str(&env, "A")), (2, String::from_str(&env, "A")), (3, String::from_str(&env, "A")), (4, String::from_str(&env, "A"))]);
+
+    // Check leaderboard: top 5 should be sorted descending.
+    // Scores: P2 (5), P4 (4), P6 (4), P1 (3), P5 (2). P3 (1) should be pushed out.
+    let leaderboard = client.get_leaderboard();
+    assert_eq!(leaderboard.len(), 5);
+
+    let (_, s0) = leaderboard.get(0).unwrap();
+    let (_, s1) = leaderboard.get(1).unwrap();
+    let (_, s2) = leaderboard.get(2).unwrap();
+    let (_, s3) = leaderboard.get(3).unwrap();
+    let (_, s4) = leaderboard.get(4).unwrap();
+
+    assert_eq!(s0, 5);
+    assert_eq!(s1, 4);
+    assert_eq!(s2, 4);
+    assert_eq!(s3, 3);
+    assert_eq!(s4, 2);
+
+    // Verify addresses are correct
+    let (a0, _) = leaderboard.get(0).unwrap();
+    let (a1, _) = leaderboard.get(1).unwrap();
+    assert_eq!(a0, p2);
+    // Since p4 and p6 both have 4 points, either order is fine depending on insert sequence.
+    assert!(a1 == p4 || a1 == p6);
+}
