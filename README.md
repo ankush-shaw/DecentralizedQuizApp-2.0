@@ -64,7 +64,8 @@ Based on our testers' feedback, we successfully completed two major development 
 ## 📱 Mobile Responsive View
 
 <p align="center">
- <img width="269" height="589" alt="image" src="https://github.com/user-attachments/assets/148168ef-ba80-4fcd-b7d9-45dbd9fff78b" />
+ <img width="278" height="587" alt="image" src="https://github.com/user-attachments/assets/ebee4ef3-44dc-43c8-a520-1625db8c70a6" />
+
 
   <br>
   <em>Fully responsive layout on mobile (390px viewport — iPhone 14)</em>
