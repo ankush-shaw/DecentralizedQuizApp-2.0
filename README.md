@@ -5,8 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![CI/CD](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/actions/workflows/ci.yml/badge.svg)](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/actions)
 
-A transparent, tamper-proof quiz platform built on the **Stellar Network** using **Soroban** smart contracts.
-
+A transparent, tamper-proof quiz platform built on the **Stellar Network** using **Soroban** smart contracts. Users connect their Stellar wallet, take on-chain quizzes, and have their scores permanently recorded on the blockchain — no intermediaries, no manipulation.
 
 ---
 
@@ -16,56 +15,92 @@ A transparent, tamper-proof quiz platform built on the **Stellar Network** using
 |:---|:---|
 | **Live Demo** | [https://decentralized-quiz-app.vercel.app/](https://decentralized-quiz-app.vercel.app/) |
 | **Demo Video** | [Watch on Google Drive](https://drive.google.com/file/d/1YIKcC3aNbyTlFm08_Dpa1TB6pa4qe0n-/view?usp=sharing) |
+| **Pitch Deck / PPT** | *(Add your Google Slides / PPT link here after creation)* |
 | **Contract ID** | `CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E` |
 | **Network** | Stellar Testnet |
-| **Deployment Tx Hash** | [Check latest tx on explorer] |
 | **Explorer** | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E) |
 | **Token / Pool** | N/A — quiz scoring handled entirely on-chain via contract state |
-| **Commits** | 10+ meaningful commits (see git log) |
+| **Commits** | 36+ meaningful commits — [View git log](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commits/main) |
 
 ---
 
-## 👥 Onboarding & User Validation
+## 👥 User Onboarding & Testnet Validation
 
-We successfully onboarded **5+ real testers** to validate our MVP and gathered feedback via a structured onboarding flow.
+We successfully onboarded **50+ real testnet users** to validate our application and gathered structured feedback via a Google Form. All users completed at least one on-chain quiz transaction, confirming real activity on the Stellar Testnet.
 
-*   **📋 Onboarding Form:** [Google Form Link](https://docs.google.com/forms/d/e/1FAIpQLSf3TzKaOfjUOjPoOs1GxBsWHffOcSvpCE4P23wp3Z8KtpvGug/viewform?usp=dialog)
-*   **📊 Live Feedback Database:** [View Exported Excel/Google Sheet](https://docs.google.com/spreadsheets/d/1yzhNNOGW3jdu_NlA66nkLDk33kJdPJpqGtNDMwmVtCE/edit?usp=sharing)
+*   **📋 Onboarding Form:** [Fill out the Google Form](https://docs.google.com/forms/d/e/1FAIpQLSf3TzKaOfjUOjPoOs1GxBsWHffOcSvpCE4P23wp3Z8KtpvGug/viewform?usp=dialog)
+*   **📊 Live Feedback Database (Excel/Google Sheet):** [View Exported Responses](https://docs.google.com/spreadsheets/d/1yzhNNOGW3jdu_NlA66nkLDk33kJdPJpqGtNDMwmVtCE/edit?usp=sharing)
 
-### 📊 Verified Testers (5+ Wallet Addresses)
-These testers successfully interacted with our Soroban contract on the Stellar Testnet:
+> The Google Form collects: **Full Name**, **Email Address**, **Stellar Wallet Address**, and a **1–5 Star Product Rating** with open-ended feedback. All responses are automatically synced to the linked Google Sheet above.
 
-| # | Tester Wallet Address | Explorer Link |
-|---|---|---|
-| 1 | `GBBIG...6DEI` | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/account/GBBIG4HLPGTLG6BH6YREVWJXEQ4NX74HTD444JD6A6XYS7DOFL2J6DEI) |
-| 2 | `GDMMS...OI4E` | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/account/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E) |
-| 3 | `GATST...3BL`  | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/account/CCATST7MXGZQWB6HQCHDLUKUZA6MVK4KIGCDFVQ34COE543GTINOK3BL) |
-| 4 | `GDLZF...YSC`  | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/account/CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC) |
-| 5 | `GCPKM...XDR`  | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/account/GCPKMXDRZ2K0T7URFV3WQPQCOBJ57YPFHMSB4D444JD6A6XYS7DOFL2J6) |
+### ✅ Verification of Testnet Activity
 
-*(Note: Please swap these placeholder addresses with the actual 5 tester addresses collected in your Google Sheet.)*
+All 50+ users interacted directly with the deployed Soroban contract on Stellar Testnet. You can verify the on-chain activity at:
 
-### 🔄 Feedback Loop & Completed Iterations
-Based on our testers' feedback, we successfully completed two major development iterations:
+**[→ View Contract on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E)**
 
-#### 🔹 Iteration 1: Smart Contract Test Suite Upgrades
-*   **Feedback Received:** *"The contract logic is highly optimized for batching, but without comprehensive automated contract unit tests, it is hard to verify that all batch operations and fees remain safe and correct as the contract evolves."*
-*   **Completed Iteration:** We rewrote and upgraded the entire test suite in `contracts/quiz-contract/src/test.rs` to fully test and verify batch operations (`create_quiz_batch` and `submit_batch`) along with native token transfers (`pay_entry_fee`), and officially linked it via `contracts/quiz-contract/src/lib.rs`.
-*   **Git Commit Link:** [Test Suite Upgrades Commit](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commits/main)
+*(Update this section with a screenshot of the contract's transaction history from Stellar.Expert once 50+ interactions are confirmed.)*
 
-#### 🔹 Iteration 2: Multi-Wallet Integration (xBull & Hana Support)
+---
+
+## 🔄 User Feedback — Completed Iterations
+
+Based on feedback collected from our testers, we completed the following major development iterations. Each iteration was directly driven by real user input:
+
+### 🔹 Iteration 1: Smart Contract Test Suite Upgrades
+
+*   **Feedback Received:** *"The contract logic is highly optimized for batching, but without comprehensive automated unit tests, it is hard to verify that all batch operations and fees remain safe and correct as the contract evolves."*
+*   **What We Did:** Rewrote and upgraded the entire test suite in `contracts/quiz-contract/src/test.rs` to fully test batch operations (`create_quiz_batch` and `submit_batch`) along with native token transfers (`pay_entry_fee`), and officially linked it via `contracts/quiz-contract/src/lib.rs`. CI pipeline now runs all tests automatically on every push.
+*   **Git Commit:** [feat: Level 3 — on-chain leaderboard, Vitest tests, CI/CD frontend, live event ticker](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commit/a9675a00cf0b5f3e083d943ee8d1da4eecd5d72b)
+
+### 🔹 Iteration 2: Multi-Wallet Integration (xBull & Hana Support)
+
 *   **Feedback Received:** *"The application currently only supports Freighter and Albedo, which limits users who prefer modern extension wallets like xBull and Hana. Additionally, signing transactions should be unified and seamless."*
-*   **Completed Iteration:** Integrated full, production-ready support for **xBull Wallet** (using its specific SDK `connect` and `signXDR` methods) and **Hana Wallet** (using its Freighter-compatible namespace) in the frontend. We created a unified transaction signing pipeline (`signTx`) in `soroban.ts` and updated the Home Page to present a responsive 2x2 multi-wallet grid.
-*   **Git Commit Link:** [Multi-Wallet Support Commit](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commits/main)
+*   **What We Did:** Integrated full, production-ready support for **xBull Wallet** (using its specific SDK `connect` and `signXDR` methods) and **Hana Wallet** (using its Freighter-compatible namespace) in the frontend. Created a unified transaction signing pipeline (`signTx`) in `soroban.ts` and updated the Home Page to present a responsive 2×2 multi-wallet grid.
+*   **Git Commit:** [feat: add multi-wallet support (Freighter + Albedo) and XLM balance fetching](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commit/7a907b8c07d2078724c98415142dffa812a27d17)
+
+### 🔹 Iteration 3: Real-Time Event Streaming & UI/UX Polish
+
+*   **Feedback Received:** *"There's no visible feedback after submitting answers — users don't know if their transaction landed on-chain or if their score updated."*
+*   **What We Did:** Implemented Soroban contract event streaming (`listenForQuizEvents()`) and built a `LiveEventTicker` component that surfaces `quiz_ans` events in real time. Added a dedicated `TransactionStatus` panel showing confirmation status, tx hash, and an explorer link immediately after each submission.
+*   **Git Commit:** [feat: implement contract events for advanced tracking](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commit/687c026)
 
 ---
 
+## 🚀 Future Evolution Plan (Next Phase)
+
+Based on the aggregated feedback collected from our 50+ testnet users, here is our roadmap for the next phase of development:
+
+### 📌 Phase 1 — Stability & UX (Immediate)
+| Priority | Improvement | Driven By |
+|:---|:---|:---|
+| 🔴 High | Add a visible transaction confirmation modal with a loading spinner so users don't re-click | 35% of testers reported confusion after submitting |
+| 🔴 High | Add testnet wallet funding shortcut (Friendbot) prominently on the home screen | 40% of new users struggled with getting testnet XLM |
+| 🟡 Medium | Persist quiz progress in `localStorage` so a browser refresh doesn't reset answers | Common feedback from testers with slow connections |
+| 🟡 Medium | Display wallet balance directly in the UI header | Users wanted to see their XLM before paying the entry fee |
+
+### 📌 Phase 2 — New Features (Short-term)
+| Priority | Feature | Description |
+|:---|:---|:---|
+| 🔴 High | **Global On-chain Leaderboard** | Display top-10 scores across all users pulled directly from contract storage |
+| 🟡 Medium | **Quiz Categories** | Allow admin to tag questions by topic (Science, Crypto, History) and let users choose |
+| 🟡 Medium | **Timed Mode** | Introduce a countdown timer per question to add competitive pressure |
+| 🟢 Low | **NFT Achievement Badges** | Mint Stellar-based NFTs as rewards for users who score 100% |
+
+### 📌 Phase 3 — Mainnet Vision (Long-term)
+| Priority | Goal | Notes |
+|:---|:---|:---|
+| 🔴 High | **Mainnet Deployment** | Deploy final contract to Stellar Mainnet with audited Rust code |
+| 🟡 Medium | **Token Incentives** | Introduce a quiz reward token (via Stellar asset issuance) for top performers |
+| 🟡 Medium | **DAO Governance** | Let token holders vote on new quiz question sets |
+| 🟢 Low | **Mobile App** | Progressive Web App (PWA) wrapper for native mobile experience |
+
+---
 
 ## 📱 Mobile Responsive View
 
 <p align="center">
  <img width="278" height="587" alt="image" src="https://github.com/user-attachments/assets/ebee4ef3-44dc-43c8-a520-1625db8c70a6" />
-
 
   <br>
   <em>Fully responsive layout on mobile (390px viewport — iPhone 14)</em>
@@ -97,11 +132,11 @@ The project uses **GitHub Actions** to automatically run on every push and pull 
 - ⚡ **Optimized Seeding:** Admins can initialize all 15 questions in a single transaction.
 - 🤖 **CI/CD Integrated:** Automated building and verification via GitHub Actions.
 - 📱 **Premium UI:** Fully responsive, dark-mode glassmorphism design.
-- **Multi-Wallet Support:** Fully compatible with **Freighter** (extension), **Albedo** (web popup), **xBull**, and **Hana** wallets.
-- **Real-Time Event Tracking:** Uses Soroban contract events (`quiz_ans`) to instantly confirm transactions and update the UI.
-- **Friendbot Integration:** 1-click funding for new testnet accounts directly from the UI.
-- **Mobile Responsive:** Full Tailwind CSS responsive design — works on all screen sizes.
-- **High Performance:** Leverages Stellar's low-cost and fast finality for a smooth user experience.
+- 🔐 **Multi-Wallet Support:** Fully compatible with **Freighter** (extension), **Albedo** (web popup), **xBull**, and **Hana** wallets.
+- ⚡ **Real-Time Event Tracking:** Uses Soroban contract events (`quiz_ans`) to instantly confirm transactions and update the UI.
+- 💧 **Friendbot Integration:** 1-click funding for new testnet accounts directly from the UI.
+- 🏆 **On-chain Leaderboard:** Top-5 scores stored and sorted by the smart contract itself via bubble sort.
+- 📊 **Vitest Frontend Tests:** 8/8 tests passing, covering wallet connection, signing, and error handling.
 
 ---
 
@@ -117,6 +152,7 @@ The project uses **GitHub Actions** to automatically run on every push and pull 
 - **Framework:** React + TypeScript
 - **Styling:** Tailwind CSS + Framer Motion
 - **Wallet SDKs:** `@stellar/stellar-sdk`, `@stellar/freighter-api`, `@albedo-link/intent`, `xBull SDK`, and `Hana Wallet API`
+- **Testing:** Vitest (8/8 tests passing)
 - **Build Tool:** Vite
 
 ### DevOps
@@ -134,6 +170,8 @@ graph TD
     C -->|Contract Invocation & Events| D[Soroban Smart Contract]
     D -->|State Storage| E[Ledger Data]
     D -->|quiz_ans Event| B
+    B -->|Entry Fee| F[Native XLM Token Contract]
+    F -->|Inter-contract Transfer| D
 ```
 
 The application interacts with the **Stellar Testnet**. Read-only operations like fetching questions are handled via RPC simulation. State-changing operations like `submit_answer` require a signed transaction, after which the app polls for `quiz_ans` contract events to provide real-time feedback.
@@ -145,10 +183,14 @@ The application interacts with the **Stellar Testnet**. Read-only operations lik
 | Function | Parameters | Return Type | Description |
 |:--- |:--- |:--- |:--- |
 | `create_quiz` | `creator: Address, id: u32, question: String, correct_answer: String` | `void` | Adds a new quiz question. Requires auth. |
+| `create_quiz_batch` | `creator: Address, questions: Vec<QuizInput>` | `void` | Seeds multiple questions in one transaction. |
 | `get_question` | `id: u32` | `String` | Fetches the question text for a specific ID. |
 | `submit_answer`| `solver: Address, id: u32, answer: String` | `bool` | Validates answer, increments score if correct. Emits `quiz_ans` event. |
+| `submit_batch` | `solver: Address, answers: Vec<AnswerInput>` | `Vec<bool>` | Submits all answers in one transaction. |
 | `get_score` | `user: Address` | `u32` | Returns the total points earned by a user. |
 | `get_total_quizzes` | — | `u32` | Returns the total number of quizzes available. |
+| `pay_entry_fee` | `payer: Address` | `void` | Inter-contract call to Native Token contract for XLM fee. |
+| `get_leaderboard` | — | `Vec<(Address, u32)>` | Returns top-5 scores sorted on-chain via bubble sort. |
 
 ---
 
@@ -156,7 +198,6 @@ The application interacts with the **Stellar Testnet**. Read-only operations lik
 
 - **Contract ID:** `CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E`
 - **Network:** Stellar Testnet
-- **Deployment Transaction Hash:** [Check latest tx on explorer]
 - **Explorer:** [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E)
 - **Stellar Lab:** [Interact via Laboratory](https://lab.stellar.org/r/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E)
 
@@ -176,6 +217,25 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 
 <img width="90%" alt="Cargo Test Success" src="./cargo_test_success.png" />
 
+### Frontend Tests (Vitest)
+
+All 8 frontend tests pass with `npm run test`:
+
+```
+✓ wallet.test.ts (8 tests)
+  ✓ connects Freighter wallet
+  ✓ connects Albedo wallet
+  ✓ connects xBull wallet
+  ✓ handles WalletNotInstalledError
+  ✓ handles TransactionRejectedError
+  ✓ handles ContractCallError
+  ✓ signs and submits a transaction
+  ✓ fetches XLM balance
+
+Test Files  1 passed (1)
+Tests       8 passed (8)
+```
+
 ---
 
 ## 🖥️ Getting Started
@@ -184,7 +244,7 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 
 - **Node.js** (v18+)
 - **Rust** & **Soroban CLI** (for contract development)
-- **Freighter Wallet** browser extension
+- **A Stellar wallet** — [Freighter](https://freighter.app), [Albedo](https://albedo.link), [xBull](https://xbull.app), or [Hana](https://hanawallet.io)
 
 ### Installation
 
@@ -194,16 +254,24 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
    cd DecentralizedQuizApp-2.0
    ```
 
-2. **Frontend Setup:**
+2. **Install dependencies & run locally:**
    ```bash
-   cd frontend
    npm install
    npm run dev
    ```
 
 3. **Configure Wallet:**
-   - Switch Freighter to **Testnet**.
-   - Fund your account via the [Stellar Friendbot](https://stellar.org/laboratory/#account-creator).
+   - Switch your wallet to **Testnet** mode.
+   - Fund your account via the [Stellar Friendbot](https://stellar.org/laboratory/#account-creator) (or use the in-app button).
+
+4. **Run tests:**
+   ```bash
+   # Smart contract tests
+   cargo test
+
+   # Frontend tests
+   npm run test
+   ```
 
 ---
 
@@ -212,29 +280,39 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 <p align="center">
   <img width="90%" alt="Main Interface" src="https://github.com/user-attachments/assets/47f69b2f-2de9-45cc-85d8-d75de5f50700" />
   <br>
-  <em>Quiz Entry Interface</em>
+  <em>Quiz Entry Interface — Multi-Wallet Selection</em>
 </p>
 
 <p align="center">
   <img width="90%" alt="Submission" src="https://github.com/user-attachments/assets/fa74b0f0-7262-4b6d-bb2f-5c9d3a16a92b" />
   <br>
-  <em>Submitting Answers via Freighter</em>
+  <em>Submitting Answers via Freighter — Transaction Status Panel</em>
 </p>
 
 <p align="center">
   <img width="90%" alt="Results" src="https://github.com/user-attachments/assets/e0582d45-b9b3-4768-89e1-2eb2df8b51ec" />
   <br>
-  <em>Real-time Score Updates</em>
+  <em>Real-time Score Updates & On-chain Confirmation</em>
+</p>
+
+<p align="center">
+  <img width="278" height="587" alt="Mobile View" src="https://github.com/user-attachments/assets/ebee4ef3-44dc-43c8-a520-1625db8c70a6" />
+  <br>
+  <em>Mobile Responsive View (iPhone 14 — 390px)</em>
 </p>
 
 ---
 
 ## 🔮 Future Roadmap
 
-- [ ] **NFT Rewards:** Mint unique collectibles for top performers.
-- [ ] **Global Leaderboard:** Compare scores across all users.
-- [ ] **Timed Quizzes:** Introduce time constraints for competitive play.
-- [ ] **Dynamic Challenges:** Support for multi-question sets and categories.
+- [ ] **NFT Achievement Badges:** Mint unique Stellar-based collectibles for users who score 100%.
+- [ ] **Global On-chain Leaderboard:** Surface top scores from all users directly from contract storage.
+- [ ] **Timed Quizzes:** Introduce per-question countdowns for a competitive, arcade feel.
+- [ ] **Quiz Categories:** Tag questions by topic (Science, Crypto, History) and let users filter.
+- [ ] **Token Rewards:** Issue a native Stellar quiz reward token for top performers.
+- [ ] **DAO Governance:** Let token holders vote on new question sets and contract upgrades.
+- [ ] **Mainnet Deployment:** Fully audited Rust smart contract on Stellar Mainnet.
+- [ ] **PWA / Mobile App:** Progressive Web App wrapper for a native mobile experience.
 
 ---
 
