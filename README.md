@@ -306,7 +306,7 @@ Tests       8 passed (8)
 ## 🔮 Future Roadmap
 
 - [ ] **NFT Achievement Badges:** Mint unique Stellar-based collectibles for users who score 100%.
-- [x] **Global On-chain Leaderboard:** Surface top scores from all users directly from contract storage.
+- [ ] **Global On-chain Leaderboard:** Surface top scores from all users directly from contract storage.
 - [ ] **Timed Quizzes:** Introduce per-question countdowns for a competitive, arcade feel.
 - [ ] **Quiz Categories:** Tag questions by topic (Science, Crypto, History) and let users filter.
 - [ ] **Token Rewards:** Issue a native Stellar quiz reward token for top performers.
