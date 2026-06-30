@@ -70,7 +70,6 @@ export function QuizPage({
   const currentQuestion = questions[currentIndex];
   const isLastQuestion = currentIndex === questions.length - 1;
 
-  // ── Capture starting ledger when user pays fee ─────────────────────────────
   const captureLedger = useCallback(async () => {
     try {
       const res = await fetch('https://soroban-testnet.stellar.org', {
@@ -81,31 +80,22 @@ export function QuizPage({
       const json = await res.json();
       setLedgerAtStart(Math.max(1, (json.result?.sequence ?? 100) - 2));
     } catch {
-      // Non-fatal; event polling will use a reasonable default
+      // Non-fatal
     }
   }, []);
 
-  // ── Classify error type ──────────────────────────────────────────────────────
   function classifyError(e: unknown): { message: string; type: string } {
-    if (e instanceof WalletNotInstalledError) {
-      return { message: e.message, type: 'WalletNotInstalled' };
-    }
-    if (e instanceof TransactionRejectedError) {
-      return { message: e.message, type: 'TransactionRejected' };
-    }
-    if (e instanceof ContractCallError) {
-      return { message: e.message, type: 'ContractCallError' };
-    }
+    if (e instanceof WalletNotInstalledError) return { message: e.message, type: 'WalletNotInstalled' };
+    if (e instanceof TransactionRejectedError) return { message: e.message, type: 'TransactionRejected' };
+    if (e instanceof ContractCallError) return { message: e.message, type: 'ContractCallError' };
     return { message: (e as any)?.message || 'An unexpected error occurred.', type: 'Unknown' };
   }
 
-  // ── Handle entry fee payment ─────────────────────────────────────────────────
   const handlePay = async () => {
     setIsPaying(true);
     setError(null);
     setErrorType(null);
     setTxStatus({ state: 'pending', hash: null, error: null, functionName: 'pay_entry_fee' });
-
     try {
       const success = await payEntryFee(userAddress);
       if (success) {
@@ -127,39 +117,37 @@ export function QuizPage({
     }
   };
 
-  // ── Wallet gate ──────────────────────────────────────────────────────────────
+  // ── Wallet gate
   if (!userAddress) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center glass m-6">
-        <Wallet className="w-16 h-16 text-brand-400 mb-6" />
-        <h2 className="text-2xl font-bold mb-4">Wallet Required</h2>
-        <p className="text-slate-400 mb-8 max-w-sm">
-          Please connect your wallet to participate in the decentralized quiz.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs mx-auto">
-          <button
-            onClick={() => onConnectWallet('freighter')}
-            className="btn-primary flex-1 justify-center"
-          >
-            Freighter
-          </button>
-          <button
-            onClick={() => onConnectWallet('albedo')}
-            className="btn-ghost flex-1 justify-center border border-white/10"
-          >
-            Albedo
-          </button>
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center">
+        <div className="glass p-10 max-w-sm w-full">
+          <div className="w-16 h-16 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center mb-6 mx-auto">
+            <Wallet className="w-8 h-8 text-brand-600" />
+          </div>
+          <h2 className="text-2xl font-black mb-3 text-slate-800">Wallet Required</h2>
+          <p className="text-slate-500 mb-8 text-sm leading-relaxed">
+            Please connect your wallet to participate in the decentralized quiz.
+          </p>
+          <div className="flex flex-col gap-3">
+            <button onClick={() => onConnectWallet('freighter')} className="btn-primary justify-center">
+              Connect Freighter
+            </button>
+            <button onClick={() => onConnectWallet('albedo')} className="btn-ghost justify-center">
+              Connect Albedo
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // ── Payment gate ─────────────────────────────────────────────────────────────
+  // ── Payment gate
   if (!isPaid) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <nav className="flex items-center px-6 py-5 border-b border-white/5">
-          <button onClick={onBack} className="btn-ghost text-sm flex items-center gap-2">
+      <div className="min-h-screen flex flex-col bg-slate-50">
+        <nav className="flex items-center px-6 py-4 bg-white border-b border-slate-200">
+          <button onClick={onBack} className="btn-ghost text-sm">
             <ArrowLeft size={16} /> Back
           </button>
         </nav>
@@ -169,26 +157,24 @@ export function QuizPage({
             animate={{ opacity: 1, y: 0 }}
             className="glass p-10 max-w-md w-full text-center"
           >
-            <div className="w-20 h-20 rounded-full bg-brand-500/10 flex items-center justify-center mb-8 mx-auto">
-              <Coins className="w-10 h-10 text-brand-400" />
+            <div className="w-20 h-20 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center mb-8 mx-auto">
+              <Coins className="w-10 h-10 text-brand-600" />
             </div>
-            <h2 className="text-3xl font-black mb-4">Entry Fee</h2>
-            <p className="text-slate-400 mb-8 leading-relaxed">
-              A small entry fee of{' '}
-              <span className="text-white font-bold">1.0 XLM</span> is required. This
-              is a secure{' '}
-              <span className="text-brand-400">inter-contract call</span> on the Stellar
-              network.
+            <h2 className="text-3xl font-black mb-3 text-slate-800">Entry Fee</h2>
+            <p className="text-slate-500 mb-8 leading-relaxed text-sm">
+              A small fee of{' '}
+              <span className="text-slate-800 font-bold">1.0 XLM</span> is required. This is a
+              secure{' '}
+              <span className="text-brand-600 font-semibold">inter-contract call</span> on the Stellar network.
             </p>
 
-            {/* Error display with error type badge */}
             {error && (
-              <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-left">
+              <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-left">
                 <div className="flex items-start gap-3">
-                  <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
+                  <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
                   <div>
                     {errorType && (
-                      <span className="text-xs font-mono bg-red-500/20 px-2 py-0.5 rounded text-red-300 mb-1 inline-block">
+                      <span className="text-xs font-mono bg-red-100 px-2 py-0.5 rounded text-red-500 mb-1 inline-block">
                         {errorType}
                       </span>
                     )}
@@ -206,7 +192,7 @@ export function QuizPage({
             >
               {isPaying ? (
                 <>
-                  <Loader2 className="animate-spin" size={20} />
+                  <Loader2 className="animate-spin" size={18} />
                   Processing…
                 </>
               ) : (
@@ -219,22 +205,16 @@ export function QuizPage({
     );
   }
 
-  // ── Answer handler (local, no chain call) ────────────────────────────────────
   const handleAnswer = (answer: string) => {
     if (answeredIds.has(currentQuestion.id)) return;
     const correct = answer === currentQuestion.correctAnswer;
     setResults((prev) => ({
       ...prev,
-      [currentQuestion.id]: {
-        questionId: currentQuestion.id,
-        userAnswer: answer,
-        correct,
-      },
+      [currentQuestion.id]: { questionId: currentQuestion.id, userAnswer: answer, correct },
     }));
     setAnsweredIds((prev) => new Set([...prev, currentQuestion.id]));
   };
 
-  // ── Submit all answers in one batch tx ───────────────────────────────────────
   const handleNext = async () => {
     setError(null);
     setErrorType(null);
@@ -242,29 +222,19 @@ export function QuizPage({
     if (isLastQuestion) {
       setIsSubmitting(true);
       setTxStatus({ state: 'pending', hash: null, error: null, functionName: 'submit_batch' });
-
       try {
         const allAnswers = questions.map((q) => ({
           id: q.id,
           answer: results[q.id]?.userAnswer || '',
         }));
-
-        // ── Contract call from frontend (Level 2 requirement) ────────────────
         const { score, hash } = await submitBatchAnswers(userAddress, allAnswers);
-
         setTxStatus({ state: 'success', hash, error: null, functionName: 'submit_batch' });
-
-        // ── Real-time event integration — poll for quiz_ans events ───────────
         try {
           const events = await listenForQuizEvents(ledgerAtStart);
           if (events.length > 0) setRecentEvents(events);
-        } catch {
-          // Non-fatal
-        }
-
+        } catch {}
         onComplete(score, questions.length, hash);
       } catch (e: unknown) {
-        // ── Handle all 3 named error types ───────────────────────────────────
         const { message, type } = classifyError(e);
         setError(message);
         setErrorType(type);
@@ -277,42 +247,42 @@ export function QuizPage({
     }
   };
 
-  // ── Quiz UI ──────────────────────────────────────────────────────────────────
+  // ── Quiz UI
   return (
-    <div className="min-h-screen flex flex-col">
-      <nav className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+    <div className="min-h-screen flex flex-col bg-slate-50">
+      <nav className="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200">
         <button onClick={onBack} className="btn-ghost text-sm">
-          <ArrowLeft size={16} /> Back to Home
+          <ArrowLeft size={15} /> Back to Home
         </button>
-        <span className="text-sm font-mono text-brand-400">
+        <span className="text-xs font-mono text-slate-400 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
           {userAddress.slice(0, 6)}…{userAddress.slice(-4)}
         </span>
       </nav>
 
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-2xl">
-          {/* Progress bar */}
-          <div className="flex justify-between items-center mb-8">
-            <span className="text-slate-500 text-sm font-medium">
+          {/* Progress */}
+          <div className="flex justify-between items-center mb-6">
+            <span className="text-sm text-slate-400 font-medium">
               Question {currentIndex + 1} of {questions.length}
             </span>
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               {questions.map((_, i) => (
                 <div
                   key={i}
-                  className={`h-1.5 w-8 rounded-full transition-colors ${
+                  className={`h-1.5 w-7 rounded-full transition-all duration-300 ${
                     i === currentIndex
-                      ? 'bg-brand-400'
+                      ? 'bg-brand-500'
                       : i < currentIndex
-                      ? 'bg-brand-400/30'
-                      : 'bg-white/5'
+                      ? 'bg-brand-200'
+                      : 'bg-slate-200'
                   }`}
                 />
               ))}
             </div>
           </div>
 
-          {/* Question card */}
+          {/* Question */}
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
@@ -329,34 +299,33 @@ export function QuizPage({
             </motion.div>
           </AnimatePresence>
 
-          {/* Real-time event feed */}
+          {/* Event Feed */}
           {recentEvents.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-4 p-3 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center gap-2"
+              className="mt-4 p-3 rounded-xl bg-brand-50 border border-brand-200 flex items-center gap-2"
               id="event-feed"
             >
-              <Zap size={14} className="text-brand-400 flex-shrink-0" />
-              <span className="text-xs text-brand-400">
-                {recentEvents.length} on-chain quiz event{recentEvents.length > 1 ? 's' : ''}{' '}
-                detected — contract state updated!
+              <Zap size={14} className="text-brand-500 flex-shrink-0" />
+              <span className="text-xs text-brand-600 font-medium">
+                {recentEvents.length} on-chain quiz event{recentEvents.length > 1 ? 's' : ''} detected — contract state updated!
               </span>
             </motion.div>
           )}
 
-          {/* Error display with error type badge */}
+          {/* Error */}
           {error && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="mt-4 flex items-start gap-2 text-red-400 text-sm p-3 rounded-xl bg-red-500/10 border border-red-500/20"
+              className="mt-4 flex items-start gap-2 text-red-600 text-sm p-3.5 rounded-xl bg-red-50 border border-red-200"
               id="quiz-error-display"
             >
               <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
               <div>
                 {errorType && (
-                  <span className="text-xs font-mono bg-red-500/20 px-2 py-0.5 rounded text-red-300 mb-1 inline-block">
+                  <span className="text-xs font-mono bg-red-100 px-2 py-0.5 rounded text-red-500 mb-1 inline-block">
                     {errorType}
                   </span>
                 )}
@@ -365,8 +334,8 @@ export function QuizPage({
             </motion.div>
           )}
 
-          {/* Next / Submit button */}
-          <div className="mt-10 flex justify-end">
+          {/* Next / Submit */}
+          <div className="mt-8 flex justify-end">
             <button
               onClick={handleNext}
               disabled={!answeredIds.has(currentQuestion.id) || isSubmitting}
@@ -375,19 +344,13 @@ export function QuizPage({
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="animate-spin" size={20} />
+                  <Loader2 className="animate-spin" size={18} />
                   Saving Score…
                 </>
               ) : isLastQuestion ? (
-                <>
-                  Save Results & Finish
-                  <ArrowRight size={20} />
-                </>
+                <>Save Results & Finish <ArrowRight size={18} /></>
               ) : (
-                <>
-                  Next Question
-                  <ArrowRight size={20} />
-                </>
+                <>Next Question <ArrowRight size={18} /></>
               )}
             </button>
           </div>

@@ -16,9 +16,9 @@ A transparent, tamper-proof quiz platform built on the **Stellar Network** using
 | **Live Demo** | [https://decentralized-quiz-app.vercel.app/](https://decentralized-quiz-app.vercel.app/) |
 | **Demo Video** | [Watch on Google Drive](https://drive.google.com/file/d/1p_C9hUfwrYxv0y5XZ_3m-oWm5SUaDzJC/view?usp=sharing) |
 | **Pitch Deck / PPT** | *(Add your Google Slides / PPT link here after creation)* |
-| **Contract ID** | `CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E` |
+| **Contract ID** | `CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A` |
 | **Network** | Stellar Testnet |
-| **Explorer** | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E) |
+| **Explorer** | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A) |
 | **Token / Pool** | N/A — quiz scoring handled entirely on-chain via contract state |
 | **Commits** | 36+ meaningful commits — [View git log](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commits/main) |
 
@@ -37,7 +37,7 @@ We successfully onboarded **50+ real testnet users** to validate our application
 
 All 50+ users interacted directly with the deployed Soroban contract on Stellar Testnet. You can verify the on-chain activity at:
 
-**[→ View Contract on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E)**
+**[→ View Contract on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A)**
 
 *(Update this section with a screenshot of the contract's transaction history from Stellar.Expert once 50+ interactions are confirmed.)*
 
@@ -196,10 +196,10 @@ The application interacts with the **Stellar Testnet**. Read-only operations lik
 
 ## 🔗 Deployment Details
 
-- **Contract ID:** `CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E`
+- **Contract ID:** `CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A`
 - **Network:** Stellar Testnet
-- **Explorer:** [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E)
-- **Stellar Lab:** [Interact via Laboratory](https://lab.stellar.org/r/testnet/contract/CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E)
+- **Explorer:** [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A)
+- **Stellar Lab:** [Interact via Laboratory](https://lab.stellar.org/r/testnet/contract/CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A)
 
 ---
 

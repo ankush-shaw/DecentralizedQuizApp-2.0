@@ -29,7 +29,7 @@ import type { QuizEvent } from '../types';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-export const CONTRACT_ID = 'CDMMSDM3KSHC5FBN2SIZYOH3FLT5ICAHHNYYCCEB7UFZZ3KMBT44OI4E';
+export const CONTRACT_ID = 'CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A';
 export const NETWORK_PASSPHRASE = Networks.TESTNET;
 export const RPC_URL = 'https://soroban-testnet.stellar.org';
 export const NATIVE_TOKEN = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';

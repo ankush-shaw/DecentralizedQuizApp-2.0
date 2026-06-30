@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Github, ExternalLink, Shield, Brain, Layers } from 'lucide-react';
+import { ChevronRight, Github, ExternalLink, Shield, Brain, Layers, Zap } from 'lucide-react';
 import type { WalletState } from '../types';
 import { getTotalQuizzes, getLeaderboard, CONTRACT_ID } from '../services/soroban';
 import type { WalletType } from '../services/soroban';
@@ -33,7 +33,7 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
         setTotalQuizzes(null);
       }
     }
-    
+
     async function fetchOnChainLeaderboard() {
       setIsLoadingLeaderboard(true);
       try {
@@ -50,231 +50,217 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
     fetchOnChainLeaderboard();
   }, [wallet.isConnected]);
 
-
-
   const features = [
-    { icon: Brain, title: 'On-Chain Questions', desc: 'All questions stored immutably on Stellar Soroban.' },
-    { icon: Shield, title: 'Tamper-Proof Scoring', desc: 'Your score is verified and recorded by smart contracts.' },
-    { icon: Layers, title: 'Permissionless', desc: 'Anyone can build, play, and verify results on the network.' },
+    { icon: Brain, title: 'On-Chain Questions', desc: 'All questions stored immutably on Stellar Soroban — fully transparent and verifiable.', color: 'bg-violet-50 text-violet-600 border-violet-100' },
+    { icon: Shield, title: 'Tamper-Proof Scoring', desc: 'Your score is verified and recorded by smart contracts. No admin, no cheating.', color: 'bg-blue-50 text-blue-600 border-blue-100' },
+    { icon: Layers, title: 'Permissionless', desc: 'Anyone can build, play, and verify results on the Stellar network without permission.', color: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
-      <div className="max-w-4xl w-full text-center">
-        {/* Hero Section */}
+    <div className="min-h-screen flex flex-col">
+      {/* Top Navbar */}
+      <nav className="sticky top-1 z-40 mx-4 mt-4 flex items-center justify-between px-6 py-3 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-sm">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center shadow-sm">
+            <Zap size={16} className="text-white" />
+          </div>
+          <span className="font-bold text-slate-800 text-sm tracking-tight">DQuiz</span>
+          <span className="badge bg-brand-50 text-brand-600 border border-brand-100 ml-1">Testnet</span>
+        </div>
+        <div className="flex items-center gap-3">
+          {wallet.isConnected && wallet.address ? (
+            <div className="flex items-center gap-3">
+              {wallet.balance && (
+                <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
+                  {wallet.balance} XLM
+                </span>
+              )}
+              <span className="text-xs font-mono text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
+                {wallet.address.slice(0, 6)}…{wallet.address.slice(-4)}
+              </span>
+              <button onClick={onDisconnect} className="text-xs text-slate-500 hover:text-slate-700 font-medium transition-colors px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">
+                Disconnect
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => onConnect('freighter')}
+              className="text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg transition-all shadow-sm"
+            >
+              Connect Wallet
+            </button>
+          )}
+        </div>
+      </nav>
+
+      <div className="flex-1 px-6 py-16 max-w-5xl mx-auto w-full">
+        {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-50 border border-brand-200 text-brand-600 text-xs font-semibold mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
             Powered by Stellar Soroban
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-black mb-6 tracking-tight">
-            Quiz on the <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-brand-200 to-purple-400">
-              Blockchain
-            </span>
+          <h1 className="text-5xl md:text-7xl font-black mb-5 tracking-tight leading-tight text-slate-900">
+            Quiz on the{' '}
+            <span className="text-gradient">Blockchain</span>
           </h1>
 
-          <p className="text-slate-400 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
-            A fully decentralized quiz platform where questions, answers, and scores live immutably on the Stellar network. No admin. No cheating.
+          <p className="text-slate-500 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+            A transparent, tamper-proof quiz platform. Questions, answers, and scores live immutably on the Stellar network.
           </p>
 
-          {/* Wallet State / Initialization */}
-          <div className="flex flex-col items-center gap-6">
-            <AnimatePresence mode="wait">
-              {wallet.isConnected && wallet.address ? (
-                <motion.div
-                  key="connected"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="flex flex-col items-center gap-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <button onClick={onStartQuiz} className="btn-primary group">
-                      Start Quiz
-                      <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          {/* CTA Area */}
+          <AnimatePresence mode="wait">
+            {wallet.isConnected && wallet.address ? (
+              <motion.div
+                key="connected"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="flex flex-col items-center gap-4"
+              >
+                <div className="flex items-center gap-3 flex-wrap justify-center">
+                  <button onClick={onStartQuiz} className="btn-primary group text-base px-8 py-3.5">
+                    Start Quiz
+                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  {(!totalQuizzes || totalQuizzes === 0) && (
+                    <button onClick={onInitialize} className="btn-ghost text-sm">
+                      Initialize Contract
                     </button>
-                    {(!totalQuizzes || totalQuizzes === 0) && (
-                      <button onClick={onInitialize} className="btn-ghost text-sm border border-white/10">
-                        Initialize Contract
-                      </button>
-                    )}
-                    <button onClick={onDisconnect} className="btn-ghost text-sm">
-                      Disconnect
-                    </button>
-                  </div>
-                  
-
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="flex items-center gap-2">
-                      {wallet.balance && (
-                        <div className="px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20 text-xs">
-                          {wallet.balance} XLM
-                        </div>
-                      )}
-                      <div className="text-sm text-slate-500 font-mono">
-                        {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
-                      </div>
-                    </div>
-                    
-                    {(wallet.balance === '0.00' || !wallet.balance || parseFloat(wallet.balance) < 1) && (
-                      <button 
-                        onClick={async () => {
-                          try {
-                            const res = await fetch(`https://friendbot.stellar.org?addr=${wallet.address}`);
-                            if (res.ok) {
-                              alert('Success! Account funded. Please refresh the page to see your balance.');
-                            }
-                          } catch (e) {
-                            alert('Friendbot busy. Try again in a moment.');
-                          }
-                        }}
-                        className="text-[10px] text-brand-400 hover:underline mt-1"
-                      >
-                        New account? Click to Fund with Friendbot
-                      </button>
-                    )}
-                  </div>
-                </motion.div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-2 gap-3 w-full max-w-sm mx-auto">
-                    {/* Freighter */}
-                    <motion.button
-                      key="connect-freighter"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.05 }}
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.96 }}
-                      onClick={() => onConnect('freighter')}
-                      className="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-brand-500/10 border border-brand-500/25 text-brand-300 hover:bg-brand-500/20 hover:border-brand-400/50 transition-all disabled:opacity-50"
-                      disabled={wallet.isConnecting}
-                      id="btn-connect-freighter"
-                    >
-                      <span className="text-2xl">🚀</span>
-                      <span className="text-sm font-semibold">Freighter</span>
-                    </motion.button>
-
-                    {/* Albedo */}
-                    <motion.button
-                      key="connect-albedo"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 }}
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.96 }}
-                      onClick={() => onConnect('albedo')}
-                      className="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-purple-500/10 border border-purple-500/25 text-purple-300 hover:bg-purple-500/20 hover:border-purple-400/50 transition-all disabled:opacity-50"
-                      disabled={wallet.isConnecting}
-                      id="btn-connect-albedo"
-                    >
-                      <span className="text-2xl">🌐</span>
-                      <span className="text-sm font-semibold">Albedo</span>
-                    </motion.button>
-
-                    {/* xBull */}
-                    <motion.button
-                      key="connect-xbull"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.15 }}
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.96 }}
-                      onClick={() => onConnect('xbull')}
-                      className="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-300 hover:bg-amber-500/20 hover:border-amber-400/50 transition-all disabled:opacity-50"
-                      disabled={wallet.isConnecting}
-                      id="btn-connect-xbull"
-                    >
-                      <span className="text-2xl">🐂</span>
-                      <span className="text-sm font-semibold">xBull</span>
-                    </motion.button>
-
-                    {/* Hana */}
-                    <motion.button
-                      key="connect-hana"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.96 }}
-                      onClick={() => onConnect('hana')}
-                      className="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-pink-500/10 border border-pink-500/25 text-pink-300 hover:bg-pink-500/20 hover:border-pink-400/50 transition-all disabled:opacity-50"
-                      disabled={wallet.isConnecting}
-                      id="btn-connect-hana"
-                    >
-                      <span className="text-2xl">🌸</span>
-                      <span className="text-sm font-semibold">Hana</span>
-                    </motion.button>
-                  </div>
-
-                  {wallet.error && (
-                    <p className="text-red-400 text-xs mt-2 text-center max-w-xs">{wallet.error}</p>
                   )}
-                  {wallet.isConnecting && (
-                    <p className="text-brand-400 text-xs mt-2 text-center animate-pulse">Connecting...</p>
-                  )}
-                </>
-              )}
-            </AnimatePresence>
-          </div>
+                </div>
+
+                {(wallet.balance === '0.00' || !wallet.balance || parseFloat(wallet.balance) < 1) && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(`https://friendbot.stellar.org?addr=${wallet.address}`);
+                        if (res.ok) alert('Success! Account funded. Please refresh the page.');
+                      } catch {
+                        alert('Friendbot busy. Try again.');
+                      }
+                    }}
+                    className="text-xs text-brand-500 hover:text-brand-700 hover:underline font-medium transition-colors"
+                  >
+                    New account? Click to Fund with Friendbot ↗
+                  </button>
+                )}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="disconnected"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center gap-4"
+              >
+                <p className="text-sm text-slate-500 font-medium mb-2">Connect your Stellar wallet to begin</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-lg mx-auto">
+                  {[
+                    { type: 'freighter' as WalletType, label: 'Freighter', emoji: '🚀' },
+                    { type: 'albedo' as WalletType, label: 'Albedo', emoji: '🌐' },
+                    { type: 'xbull' as WalletType, label: 'xBull', emoji: '🐂' },
+                    { type: 'hana' as WalletType, label: 'Hana', emoji: '🌸' },
+                  ].map(({ type, label, emoji }, i) => (
+                    <motion.button
+                      key={type}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => onConnect(type)}
+                      disabled={wallet.isConnecting}
+                      id={`btn-connect-${type}`}
+                      className="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+                    >
+                      <span className="text-2xl">{emoji}</span>
+                      <span className="text-xs font-bold tracking-wide">{label}</span>
+                    </motion.button>
+                  ))}
+                </div>
+                {wallet.error && <p className="text-red-500 text-xs mt-1 text-center">{wallet.error}</p>}
+                {wallet.isConnecting && <p className="text-brand-500 text-xs mt-1 animate-pulse">Connecting...</p>}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
-        {/* On-Chain Leaderboard & Live Event Stream */}
+        {/* Stats Strip */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-3 gap-4 mb-16"
+        >
+          {[
+            { label: 'Quiz Questions', value: totalQuizzes !== null ? totalQuizzes.toString() : '—' },
+            { label: 'Network', value: 'Stellar' },
+            { label: 'Entry Fee', value: '1 XLM' },
+          ].map((stat, i) => (
+            <div key={i} className="glass p-5 text-center">
+              <div className="text-2xl font-black text-slate-800 mb-1">{stat.value}</div>
+              <div className="text-xs text-slate-400 font-medium uppercase tracking-wide">{stat.label}</div>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Leaderboard + Live Events */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto w-full"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16"
         >
           <Leaderboard entries={leaderboard} isLoading={isLoadingLeaderboard} />
           <LiveEventTicker />
         </motion.div>
 
-        {/* Features Grid */}
-        <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {features.map((f, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 + i * 0.1 }}
-              className="glass p-8 text-left group hover:border-brand-500/50 transition-colors"
+              transition={{ delay: 0.2 + i * 0.08 }}
+              className="glass p-7 text-left group cursor-default hover:-translate-y-1 transition-transform duration-300"
             >
-              <div className="w-12 h-12 rounded-xl bg-brand-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <f.icon size={24} className="text-brand-400" />
+              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 ${f.color}`}>
+                <f.icon size={22} />
               </div>
-              <h3 className="text-xl font-bold mb-3">{f.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
+              <h3 className="text-base font-bold mb-2 text-slate-800">{f.title}</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">{f.desc}</p>
             </motion.div>
           ))}
         </div>
 
         {/* Footer */}
-        <footer className="mt-32 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-slate-500 text-sm flex items-center gap-4">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
+        <footer className="pt-8 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-400">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
               Soroban Testnet
             </span>
-            <span>v1.0.0</span>
+            <span className="font-mono text-slate-300">v1.0.0</span>
           </div>
-          <div className="flex items-center gap-6">
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-white transition-colors">
-              <Github size={20} />
+          <div className="flex items-center gap-5">
+            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-slate-600 transition-colors">
+              <Github size={18} />
             </a>
-            <a 
-              href={`https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`} 
-              target="_blank" 
-              rel="noreferrer" 
-              className="text-slate-500 hover:text-brand-400 transition-colors flex items-center gap-1.5 text-sm"
+            <a
+              href={`https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`}
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-brand-500 transition-colors flex items-center gap-1.5 font-medium"
             >
-              View Contract <ExternalLink size={14} />
+              View Contract <ExternalLink size={13} />
             </a>
           </div>
         </footer>
@@ -282,20 +268,3 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
     </div>
   );
 }
-
-const Loader2 = ({ size, className }: { size: number; className: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-  </svg>
-);

@@ -11,35 +11,27 @@ const EXPLORER_BASE = 'https://stellar.expert/explorer/testnet/tx';
 
 /**
  * TransactionStatus — a floating panel that shows live transaction lifecycle feedback.
- *
  * Level 2 Requirement: Transaction status visible to the user.
- * States: PENDING → SUCCESS (with hash + explorer link) or FAILED (with error reason).
  */
 export function TransactionStatus({ status, onDismiss }: TransactionStatusProps) {
   if (status.state === 'idle') return null;
 
   const isPending = status.state === 'pending';
   const isSuccess = status.state === 'success';
-  const isFailed  = status.state === 'failed';
+  const isFailed = status.state === 'failed';
 
-  const borderColor = isPending
-    ? 'border-brand-500/40'
+  const panelStyle = isPending
+    ? 'border-brand-200 bg-white'
     : isSuccess
-    ? 'border-green-500/40'
-    : 'border-red-500/40';
-
-  const bgColor = isPending
-    ? 'bg-brand-500/10'
-    : isSuccess
-    ? 'bg-green-500/10'
-    : 'bg-red-500/10';
+    ? 'border-emerald-200 bg-white'
+    : 'border-red-200 bg-white';
 
   const icon = isPending ? (
-    <Loader2 size={20} className="text-brand-400 animate-spin" />
+    <Loader2 size={18} className="text-brand-500 animate-spin" />
   ) : isSuccess ? (
-    <CheckCircle2 size={20} className="text-green-400" />
+    <CheckCircle2 size={18} className="text-emerald-500" />
   ) : (
-    <XCircle size={20} className="text-red-400" />
+    <XCircle size={18} className="text-red-500" />
   );
 
   const label = isPending
@@ -49,10 +41,10 @@ export function TransactionStatus({ status, onDismiss }: TransactionStatusProps)
     : 'Transaction Failed';
 
   const labelColor = isPending
-    ? 'text-brand-300'
+    ? 'text-brand-700'
     : isSuccess
-    ? 'text-green-300'
-    : 'text-red-300';
+    ? 'text-emerald-700'
+    : 'text-red-700';
 
   return (
     <AnimatePresence>
@@ -62,7 +54,7 @@ export function TransactionStatus({ status, onDismiss }: TransactionStatusProps)
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 40, scale: 0.95 }}
         transition={{ type: 'spring', bounce: 0.3 }}
-        className={`fixed bottom-6 right-6 z-50 max-w-sm w-full rounded-2xl border ${borderColor} ${bgColor} backdrop-blur-xl p-4 shadow-2xl`}
+        className={`fixed bottom-6 right-6 z-50 max-w-sm w-full rounded-2xl border ${panelStyle} p-4 shadow-card-hover`}
         id="tx-status-panel"
       >
         {/* Header */}
@@ -74,7 +66,7 @@ export function TransactionStatus({ status, onDismiss }: TransactionStatusProps)
           {!isPending && (
             <button
               onClick={onDismiss}
-              className="text-slate-500 hover:text-slate-300 transition-colors flex-shrink-0"
+              className="text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0"
               aria-label="Dismiss"
             >
               <X size={16} />
@@ -82,11 +74,11 @@ export function TransactionStatus({ status, onDismiss }: TransactionStatusProps)
           )}
         </div>
 
-        {/* Pending pulse bar */}
+        {/* Pending progress bar */}
         {isPending && (
-          <div className="mt-3 h-1 rounded-full bg-white/5 overflow-hidden">
+          <div className="mt-3 h-1 rounded-full bg-slate-100 overflow-hidden">
             <motion.div
-              className="h-full bg-brand-400 rounded-full"
+              className="h-full bg-brand-500 rounded-full"
               animate={{ x: ['-100%', '200%'] }}
               transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
             />
@@ -95,25 +87,25 @@ export function TransactionStatus({ status, onDismiss }: TransactionStatusProps)
 
         {/* Success: tx hash + explorer link */}
         {isSuccess && status.hash && (
-          <div className="mt-3 flex items-center gap-2">
-            <span className="text-xs text-slate-400 font-mono truncate">
+          <div className="mt-3 flex items-center gap-2 bg-slate-50 rounded-lg px-2.5 py-1.5">
+            <span className="text-xs text-slate-500 font-mono truncate">
               {status.hash.slice(0, 8)}…{status.hash.slice(-6)}
             </span>
             <a
               href={`${EXPLORER_BASE}/${status.hash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand-400 hover:text-brand-300 transition-colors flex-shrink-0"
+              className="text-brand-500 hover:text-brand-700 transition-colors flex-shrink-0"
               title="View on Stellar Expert"
             >
-              <ExternalLink size={14} />
+              <ExternalLink size={13} />
             </a>
           </div>
         )}
 
         {/* Failed: error message */}
         {isFailed && status.error && (
-          <p className="mt-2 text-xs text-red-400 leading-relaxed">{status.error}</p>
+          <p className="mt-2 text-xs text-red-500 leading-relaxed">{status.error}</p>
         )}
       </motion.div>
     </AnimatePresence>

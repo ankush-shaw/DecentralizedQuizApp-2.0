@@ -16,21 +16,21 @@ export function WalletConnect({ wallet, onConnect, onDisconnect }: WalletConnect
   if (wallet.isConnected && wallet.address) {
     return (
       <div className="flex items-center gap-3">
-        <div className="glass px-4 py-2 flex items-center gap-2 rounded-xl">
-          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-sm font-mono text-slate-300">{shortAddress}</span>
+        <div className="glass px-4 py-2 flex items-center gap-2 rounded-xl border-zinc-800/80">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-sm font-mono text-zinc-300">{shortAddress}</span>
           <a
             href={`https://stellar.expert/explorer/testnet/account/${wallet.address}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-400 hover:text-brand-300 transition-colors"
+            className="text-brand-300 hover:text-brand-200 transition-colors"
           >
             <ExternalLink size={14} />
           </a>
         </div>
         <button
           onClick={onDisconnect}
-          className="p-2 rounded-xl glass text-slate-400 hover:text-red-400 hover:border-red-500/30 transition-all"
+          className="p-2 rounded-xl glass text-zinc-400 hover:text-rose-400 hover:border-rose-500/30 border-zinc-800/60 transition-all"
           title="Disconnect"
         >
           <LogOut size={18} />

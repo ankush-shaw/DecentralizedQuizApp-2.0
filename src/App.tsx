@@ -64,16 +64,17 @@ function App() {
   }, [wallet.address]);
 
   return (
-    <div className="min-h-screen bg-slate-950">
-      {/* Background gradient */}
-      <div className="fixed inset-0 bg-gradient-to-br from-brand-950/30 via-slate-950 to-purple-950/20 pointer-events-none" />
-      {/* Grid texture */}
+    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-brand-100 selection:text-brand-700">
+      {/* Subtle decorative top gradient bar */}
+      <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-500 via-violet-500 to-brand-600 z-50" />
+
+      {/* Light background mesh pattern */}
       <div
-        className="fixed inset-0 pointer-events-none opacity-5"
+        className="fixed inset-0 pointer-events-none opacity-[0.025]"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)',
-          backgroundSize: '50px 50px',
+            'radial-gradient(circle at 1px 1px, rgb(99,102,241) 1px, transparent 0)',
+          backgroundSize: '32px 32px',
         }}
       />
 
