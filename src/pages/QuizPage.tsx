@@ -10,6 +10,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { QuestionCard } from '../components/QuestionCard';
+import { ThemeToggle } from '../components/ThemeToggle';
 import {
   getTotalQuizzes,
   payEntryFee,
@@ -22,6 +23,7 @@ import {
   ContractCallError,
 } from '../services/errors';
 import type { Question, QuizResult, QuizEvent, TxStatus } from '../types';
+import type { Theme } from '../hooks/useTheme';
 import quizData from '../data/questions.json';
 
 const QUIZ_QUESTIONS = quizData as Question[];
@@ -41,6 +43,8 @@ interface QuizPageProps {
   onBack: () => void;
   onConnectWallet: (type: 'freighter' | 'albedo') => void;
   setTxStatus: (status: TxStatus) => void;
+  theme: Theme;
+  onToggleTheme: () => void;
 }
 
 export function QuizPage({
@@ -49,6 +53,8 @@ export function QuizPage({
   onBack,
   onConnectWallet,
   setTxStatus,
+  theme,
+  onToggleTheme,
 }: QuizPageProps) {
   const [isPaid, setIsPaid] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
@@ -120,13 +126,16 @@ export function QuizPage({
   // ── Wallet gate
   if (!userAddress) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center relative">
+        <div className="absolute top-6 right-6">
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+        </div>
         <div className="glass p-10 max-w-sm w-full">
-          <div className="w-16 h-16 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center mb-6 mx-auto">
-            <Wallet className="w-8 h-8 text-brand-600" />
+          <div className="w-16 h-16 rounded-2xl bg-brand-50 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-900 flex items-center justify-center mb-6 mx-auto">
+            <Wallet className="w-8 h-8 text-brand-600 dark:text-brand-400" />
           </div>
-          <h2 className="text-2xl font-black mb-3 text-slate-800">Wallet Required</h2>
-          <p className="text-slate-500 mb-8 text-sm leading-relaxed">
+          <h2 className="text-2xl font-black mb-3 text-slate-800 dark:text-slate-100">Wallet Required</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm leading-relaxed">
             Please connect your wallet to participate in the decentralized quiz.
           </p>
           <div className="flex flex-col gap-3">
@@ -145,11 +154,12 @@ export function QuizPage({
   // ── Payment gate
   if (!isPaid) {
     return (
-      <div className="min-h-screen flex flex-col bg-slate-50">
-        <nav className="flex items-center px-6 py-4 bg-white border-b border-slate-200">
+      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
+        <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
           <button onClick={onBack} className="btn-ghost text-sm">
             <ArrowLeft size={16} /> Back
           </button>
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
         </nav>
         <div className="flex-1 flex items-center justify-center p-6">
           <motion.div
@@ -157,24 +167,24 @@ export function QuizPage({
             animate={{ opacity: 1, y: 0 }}
             className="glass p-10 max-w-md w-full text-center"
           >
-            <div className="w-20 h-20 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center mb-8 mx-auto">
-              <Coins className="w-10 h-10 text-brand-600" />
+            <div className="w-20 h-20 rounded-2xl bg-brand-50 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-900 flex items-center justify-center mb-8 mx-auto">
+              <Coins className="w-10 h-10 text-brand-600 dark:text-brand-400" />
             </div>
-            <h2 className="text-3xl font-black mb-3 text-slate-800">Entry Fee</h2>
-            <p className="text-slate-500 mb-8 leading-relaxed text-sm">
+            <h2 className="text-3xl font-black mb-3 text-slate-800 dark:text-slate-100">Entry Fee</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed text-sm">
               A small fee of{' '}
-              <span className="text-slate-800 font-bold">1.0 XLM</span> is required. This is a
+              <span className="text-slate-800 dark:text-slate-200 font-bold">1.0 XLM</span> is required. This is a
               secure{' '}
-              <span className="text-brand-600 font-semibold">inter-contract call</span> on the Stellar network.
+              <span className="text-brand-600 dark:text-brand-400 font-semibold">inter-contract call</span> on the Stellar network.
             </p>
 
             {error && (
-              <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-left">
+              <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-left">
                 <div className="flex items-start gap-3">
                   <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
                   <div>
                     {errorType && (
-                      <span className="text-xs font-mono bg-red-100 px-2 py-0.5 rounded text-red-500 mb-1 inline-block">
+                      <span className="text-xs font-mono bg-red-100 dark:bg-red-900/50 px-2 py-0.5 rounded text-red-500 dark:text-red-400 mb-1 inline-block">
                         {errorType}
                       </span>
                     )}
@@ -249,21 +259,24 @@ export function QuizPage({
 
   // ── Quiz UI
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <nav className="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
+      <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
         <button onClick={onBack} className="btn-ghost text-sm">
           <ArrowLeft size={15} /> Back to Home
         </button>
-        <span className="text-xs font-mono text-slate-400 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
-          {userAddress.slice(0, 6)}…{userAddress.slice(-4)}
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-mono text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
+            {userAddress.slice(0, 6)}…{userAddress.slice(-4)}
+          </span>
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+        </div>
       </nav>
 
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-2xl">
           {/* Progress */}
           <div className="flex justify-between items-center mb-6">
-            <span className="text-sm text-slate-400 font-medium">
+            <span className="text-sm text-slate-400 dark:text-slate-500 font-medium">
               Question {currentIndex + 1} of {questions.length}
             </span>
             <div className="flex gap-1.5">
@@ -274,8 +287,8 @@ export function QuizPage({
                     i === currentIndex
                       ? 'bg-brand-500'
                       : i < currentIndex
-                      ? 'bg-brand-200'
-                      : 'bg-slate-200'
+                      ? 'bg-brand-200 dark:bg-brand-800'
+                      : 'bg-slate-200 dark:bg-slate-700'
                   }`}
                 />
               ))}
@@ -304,11 +317,11 @@ export function QuizPage({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-4 p-3 rounded-xl bg-brand-50 border border-brand-200 flex items-center gap-2"
+              className="mt-4 p-3 rounded-xl bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-900 flex items-center gap-2"
               id="event-feed"
             >
-              <Zap size={14} className="text-brand-500 flex-shrink-0" />
-              <span className="text-xs text-brand-600 font-medium">
+              <Zap size={14} className="text-brand-500 dark:text-brand-400 flex-shrink-0" />
+              <span className="text-xs text-brand-600 dark:text-brand-400 font-medium">
                 {recentEvents.length} on-chain quiz event{recentEvents.length > 1 ? 's' : ''} detected — contract state updated!
               </span>
             </motion.div>
@@ -319,13 +332,13 @@ export function QuizPage({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="mt-4 flex items-start gap-2 text-red-600 text-sm p-3.5 rounded-xl bg-red-50 border border-red-200"
+              className="mt-4 flex items-start gap-2 text-red-600 dark:text-red-400 text-sm p-3.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900"
               id="quiz-error-display"
             >
               <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
               <div>
                 {errorType && (
-                  <span className="text-xs font-mono bg-red-100 px-2 py-0.5 rounded text-red-500 mb-1 inline-block">
+                  <span className="text-xs font-mono bg-red-100 dark:bg-red-900/50 px-2 py-0.5 rounded text-red-500 dark:text-red-400 mb-1 inline-block">
                     {errorType}
                   </span>
                 )}

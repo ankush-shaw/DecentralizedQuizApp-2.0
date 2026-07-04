@@ -29,8 +29,8 @@ export function ScoreDisplay({ score, total, address, onPlayAgain }: ScoreDispla
     >
       {/* Icon */}
       <div className="flex justify-center mb-6">
-        <div className="p-5 rounded-2xl bg-brand-50 border border-brand-100">
-          <Trophy size={44} className="text-brand-600" />
+        <div className="p-5 rounded-2xl bg-brand-50 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-900">
+          <Trophy size={44} className="text-brand-600 dark:text-brand-400" />
         </div>
       </div>
 
@@ -55,23 +55,23 @@ export function ScoreDisplay({ score, total, address, onPlayAgain }: ScoreDispla
             transition={{ duration: 1.5, ease: 'easeOut' }}
           />
         </svg>
-        <div className="absolute text-3xl font-black text-slate-800">{percentage}%</div>
+        <div className="absolute text-3xl font-black text-slate-800 dark:text-slate-100">{percentage}%</div>
       </motion.div>
 
       {/* Message */}
       <h2 className={`text-2xl font-bold mb-2 ${color}`}>{text}</h2>
-      <p className="text-slate-500 text-sm mb-2">
-        You answered <span className="text-slate-800 font-bold">{score}</span> out of{' '}
-        <span className="text-slate-800 font-bold">{total}</span> questions correctly.
+      <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">
+        You answered <span className="text-slate-800 dark:text-slate-200 font-bold">{score}</span> out of{' '}
+        <span className="text-slate-800 dark:text-slate-200 font-bold">{total}</span> questions correctly.
       </p>
 
       {/* On-chain badge */}
-      <div className="mt-5 p-3 rounded-xl bg-brand-50 border border-brand-100">
-        <div className="flex items-center justify-center gap-2 text-brand-600 text-sm mb-1">
+      <div className="mt-5 p-3 rounded-xl bg-brand-50 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-900">
+        <div className="flex items-center justify-center gap-2 text-brand-600 dark:text-brand-400 text-sm mb-1">
           <Zap size={13} />
           <span className="font-semibold">Score recorded on-chain for</span>
         </div>
-        <p className="font-mono text-xs text-slate-400 truncate">{address}</p>
+        <p className="font-mono text-xs text-slate-400 dark:text-slate-500 truncate">{address}</p>
       </div>
 
       <motion.button

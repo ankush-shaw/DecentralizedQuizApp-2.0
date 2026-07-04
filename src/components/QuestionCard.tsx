@@ -12,7 +12,7 @@ export function QuestionCard({ question, onAnswer, selectedAnswer, disabled }: Q
   return (
     <div className="glass p-8 w-full max-w-2xl mx-auto">
       {/* Question Text */}
-      <h2 className="text-lg font-bold text-slate-800 mb-7 leading-relaxed">
+      <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-7 leading-relaxed">
         {question.text}
       </h2>
 
@@ -23,7 +23,7 @@ export function QuestionCard({ question, onAnswer, selectedAnswer, disabled }: Q
 
           let className = 'answer-option';
           if (isSelected) {
-            className = 'w-full text-left p-4 rounded-xl border border-brand-400 bg-brand-50 hover:bg-brand-50 transition-all duration-200 font-semibold text-brand-700 shadow-md flex items-center justify-between';
+            className = 'w-full text-left p-4 rounded-xl border border-brand-400 dark:border-brand-500 bg-brand-50 dark:bg-brand-950/40 hover:bg-brand-50 dark:hover:bg-brand-950/40 transition-all duration-200 font-semibold text-brand-700 dark:text-brand-300 shadow-md flex items-center justify-between';
           } else {
             className = 'answer-option flex items-center justify-between';
           }

@@ -6,6 +6,8 @@ import { getTotalQuizzes, getLeaderboard, CONTRACT_ID } from '../services/soroba
 import type { WalletType } from '../services/soroban';
 import { Leaderboard } from '../components/Leaderboard';
 import { LiveEventTicker } from '../components/LiveEventTicker';
+import { ThemeToggle } from '../components/ThemeToggle';
+import type { Theme } from '../hooks/useTheme';
 
 interface HomePageProps {
   wallet: WalletState;
@@ -13,9 +15,11 @@ interface HomePageProps {
   onDisconnect: () => void;
   onStartQuiz: () => void;
   onInitialize: () => Promise<void>;
+  theme: Theme;
+  onToggleTheme: () => void;
 }
 
-export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onInitialize }: HomePageProps) {
+export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onInitialize, theme, onToggleTheme }: HomePageProps) {
   const [totalQuizzes, setTotalQuizzes] = useState<number | null>(null);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
@@ -59,26 +63,26 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top Navbar */}
-      <nav className="sticky top-1 z-40 mx-4 mt-4 flex items-center justify-between px-6 py-3 bg-white/80 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-sm">
+      <nav className="sticky top-1 z-40 mx-4 mt-4 flex items-center justify-between px-6 py-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-sm">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center shadow-sm">
             <Zap size={16} className="text-white" />
           </div>
-          <span className="font-bold text-slate-800 text-sm tracking-tight">DQuiz</span>
-          <span className="badge bg-brand-50 text-brand-600 border border-brand-100 ml-1">Testnet</span>
+          <span className="font-bold text-slate-800 dark:text-slate-100 text-sm tracking-tight">DQuiz</span>
+          <span className="badge bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 border border-brand-100 dark:border-brand-900 ml-1">Testnet</span>
         </div>
         <div className="flex items-center gap-3">
           {wallet.isConnected && wallet.address ? (
             <div className="flex items-center gap-3">
               {wallet.balance && (
-                <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
                   {wallet.balance} XLM
                 </span>
               )}
-              <span className="text-xs font-mono text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
+              <span className="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
                 {wallet.address.slice(0, 6)}…{wallet.address.slice(-4)}
               </span>
-              <button onClick={onDisconnect} className="text-xs text-slate-500 hover:text-slate-700 font-medium transition-colors px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">
+              <button onClick={onDisconnect} className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-medium transition-colors px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
                 Disconnect
               </button>
             </div>
@@ -90,6 +94,7 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
               Connect Wallet
             </button>
           )}
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
         </div>
       </nav>
 
@@ -101,17 +106,17 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
           transition={{ duration: 0.5 }}
           className="text-center mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-50 border border-brand-200 text-brand-600 text-xs font-semibold mb-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-50 dark:bg-brand-950/50 border border-brand-200 dark:border-brand-900 text-brand-600 dark:text-brand-400 text-xs font-semibold mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
             Powered by Stellar Soroban
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-black mb-5 tracking-tight leading-tight text-slate-900">
+          <h1 className="text-5xl md:text-7xl font-black mb-5 tracking-tight leading-tight text-slate-900 dark:text-white">
             Quiz on the{' '}
             <span className="text-gradient">Blockchain</span>
           </h1>
 
-          <p className="text-slate-500 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-500 dark:text-slate-400 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
             A transparent, tamper-proof quiz platform. Questions, answers, and scores live immutably on the Stellar network.
           </p>
 
@@ -147,7 +152,7 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                         alert('Friendbot busy. Try again.');
                       }
                     }}
-                    className="text-xs text-brand-500 hover:text-brand-700 hover:underline font-medium transition-colors"
+                    className="text-xs text-brand-500 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 hover:underline font-medium transition-colors"
                   >
                     New account? Click to Fund with Friendbot ↗
                   </button>
@@ -160,7 +165,7 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col items-center gap-4"
               >
-                <p className="text-sm text-slate-500 font-medium mb-2">Connect your Stellar wallet to begin</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-2">Connect your Stellar wallet to begin</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-lg mx-auto">
                   {[
                     { type: 'freighter' as WalletType, label: 'Freighter', emoji: '🚀' },
@@ -178,7 +183,7 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                       onClick={() => onConnect(type)}
                       disabled={wallet.isConnecting}
                       id={`btn-connect-${type}`}
-                      className="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-white border border-slate-200 text-slate-600 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+                      className="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-50 dark:hover:bg-brand-950/40 hover:border-brand-200 dark:hover:border-brand-800 hover:text-brand-700 dark:hover:text-brand-400 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
                     >
                       <span className="text-2xl">{emoji}</span>
                       <span className="text-xs font-bold tracking-wide">{label}</span>
@@ -205,8 +210,8 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
             { label: 'Entry Fee', value: '1 XLM' },
           ].map((stat, i) => (
             <div key={i} className="glass p-5 text-center">
-              <div className="text-2xl font-black text-slate-800 mb-1">{stat.value}</div>
-              <div className="text-xs text-slate-400 font-medium uppercase tracking-wide">{stat.label}</div>
+              <div className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-1">{stat.value}</div>
+              <div className="text-xs text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wide">{stat.label}</div>
             </div>
           ))}
         </motion.div>
@@ -232,33 +237,33 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
               transition={{ delay: 0.2 + i * 0.08 }}
               className="glass p-7 text-left group cursor-default hover:-translate-y-1 transition-transform duration-300"
             >
-              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 ${f.color}`}>
+              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 dark:brightness-125 dark:bg-opacity-10 dark:border-opacity-30 ${f.color}`}>
                 <f.icon size={22} />
               </div>
-              <h3 className="text-base font-bold mb-2 text-slate-800">{f.title}</h3>
-              <p className="text-slate-500 text-sm leading-relaxed">{f.desc}</p>
+              <h3 className="text-base font-bold mb-2 text-slate-800 dark:text-slate-100">{f.title}</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{f.desc}</p>
             </motion.div>
           ))}
         </div>
 
         {/* Footer */}
-        <footer className="pt-8 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-400">
+        <footer className="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-400 dark:text-slate-500">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
               Soroban Testnet
             </span>
-            <span className="font-mono text-slate-300">v1.0.0</span>
+            <span className="font-mono text-slate-300 dark:text-slate-600">v1.0.0</span>
           </div>
           <div className="flex items-center gap-5">
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-slate-600 transition-colors">
+            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
               <Github size={18} />
             </a>
             <a
               href={`https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`}
               target="_blank"
               rel="noreferrer"
-              className="hover:text-brand-500 transition-colors flex items-center gap-1.5 font-medium"
+              className="hover:text-brand-500 dark:hover:text-brand-400 transition-colors flex items-center gap-1.5 font-medium"
             >
               View Contract <ExternalLink size={13} />
             </a>

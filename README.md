@@ -15,7 +15,7 @@ A transparent, tamper-proof quiz platform built on the **Stellar Network** using
 |:---|:---|
 | **Live Demo** | [https://decentralized-quiz-app.vercel.app/](https://decentralized-quiz-app.vercel.app/) |
 | **Demo Video** | [Watch on Google Drive](https://drive.google.com/file/d/1p_C9hUfwrYxv0y5XZ_3m-oWm5SUaDzJC/view?usp=sharing) |
-| **Pitch Deck / PPT** | *(Add your Google Slides / PPT link here after creation)* |
+| **Pitch Deck / PPT** | [Check out the PPT](https://docs.google.com/presentation/d/1ANcSxP3QiWgW7f2-DCfqr4R_cK8rImM3/edit?usp=sharing&ouid=104656030980064295821&rtpof=true&sd=true) |
 | **Contract ID** | `CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A` |
 | **Network** | Stellar Testnet |
 | **Explorer** | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A) |

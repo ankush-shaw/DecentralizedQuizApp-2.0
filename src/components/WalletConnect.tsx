@@ -18,12 +18,12 @@ export function WalletConnect({ wallet, onConnect, onDisconnect }: WalletConnect
       <div className="flex items-center gap-3">
         <div className="glass px-4 py-2 flex items-center gap-2 rounded-xl border-zinc-800/80">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-sm font-mono text-zinc-300">{shortAddress}</span>
+          <span className="text-sm font-mono text-zinc-700 dark:text-zinc-300">{shortAddress}</span>
           <a
             href={`https://stellar.expert/explorer/testnet/account/${wallet.address}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-300 hover:text-brand-200 transition-colors"
+            className="text-brand-500 dark:text-brand-300 hover:text-brand-700 dark:hover:text-brand-200 transition-colors"
           >
             <ExternalLink size={14} />
           </a>

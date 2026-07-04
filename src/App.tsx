@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useWallet } from './hooks/useWallet';
+import { useTheme } from './hooks/useTheme';
 import { initializeContract } from './services/soroban';
 import { HomePage } from './pages/HomePage';
 import { QuizPage } from './pages/QuizPage';
@@ -25,6 +26,7 @@ const DEFAULT_TX_STATUS: TxStatus = {
 
 function App() {
   const { wallet, connect, disconnect } = useWallet();
+  const { theme, toggleTheme } = useTheme();
   const [page, setPage] = useState<Page>('home');
   const [outcome, setOutcome] = useState<QuizOutcome | null>(null);
 
@@ -64,13 +66,13 @@ function App() {
   }, [wallet.address]);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-brand-100 selection:text-brand-700">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-brand-100 selection:text-brand-700 transition-colors duration-300">
       {/* Subtle decorative top gradient bar */}
       <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-500 via-violet-500 to-brand-600 z-50" />
 
       {/* Light background mesh pattern */}
       <div
-        className="fixed inset-0 pointer-events-none opacity-[0.025]"
+        className="fixed inset-0 pointer-events-none opacity-[0.025] dark:opacity-[0.04]"
         style={{
           backgroundImage:
             'radial-gradient(circle at 1px 1px, rgb(99,102,241) 1px, transparent 0)',
@@ -93,6 +95,8 @@ function App() {
                 onDisconnect={disconnect}
                 onStartQuiz={handleStartQuiz}
                 onInitialize={handleInitialize}
+                theme={theme}
+                onToggleTheme={toggleTheme}
               />
             </motion.div>
           )}
@@ -110,6 +114,8 @@ function App() {
                 onBack={() => setPage('home')}
                 onConnectWallet={connect}
                 setTxStatus={setTxStatus}
+                theme={theme}
+                onToggleTheme={toggleTheme}
               />
             </motion.div>
           )}
@@ -128,6 +134,8 @@ function App() {
                 txHash={outcome.txHash}
                 onPlayAgain={handlePlayAgain}
                 onHome={() => setPage('home')}
+                theme={theme}
+                onToggleTheme={toggleTheme}
               />
             </motion.div>
           )}
