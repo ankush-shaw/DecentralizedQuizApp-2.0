@@ -65,6 +65,13 @@ Based on feedback collected from our testers, we completed the following major d
 *   **What We Did:** Implemented Soroban contract event streaming (`listenForQuizEvents()`) and built a `LiveEventTicker` component that surfaces `quiz_ans` events in real time. Added a dedicated `TransactionStatus` panel showing confirmation status, tx hash, and an explorer link immediately after each submission.
 *   **Git Commit:** [feat: implement contract events for advanced tracking](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commit/687c026)
 
+### 🔹 Iteration 4: Dark Mode & UI Accessibility Enhancement
+
+* **Feedback Received:** *"The interface looks clean, but prolonged usage can be uncomfortable in bright themes. A dark mode option would improve accessibility, reduce eye strain, and provide a more modern user experience."*
+
+* **What We Did:** Implemented a fully responsive **Dark Mode** across the entire application with a persistent theme toggle. Updated all pages, components, cards, navigation, forms, buttons, and interactive elements to support both light and dark themes while maintaining consistent contrast, readability, and accessibility. The selected theme is automatically remembered across user sessions, providing a seamless and personalized user experience.
+
+* **Git Commit:** [feat: add dark mode toggle across the application](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commit/d58d509)
 ---
 
 ## 🚀 Future Evolution Plan (Next Phase)
