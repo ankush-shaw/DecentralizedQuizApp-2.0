@@ -1,4 +1,4 @@
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 import type { Question } from '../types';
 
 interface QuestionCardProps {
@@ -15,6 +15,13 @@ export function QuestionCard({ question, onAnswer, selectedAnswer, disabled }: Q
       <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-7 leading-relaxed">
         {question.text}
       </h2>
+
+      {selectedAnswer === '__TIMEOUT__' && (
+        <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 font-semibold flex items-center justify-center gap-2">
+          <AlertCircle size={18} />
+          Time's Up! No answer was submitted.
+        </div>
+      )}
 
       {/* Answer Options */}
       <div className="space-y-3">
