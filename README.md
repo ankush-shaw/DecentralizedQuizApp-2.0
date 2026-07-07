@@ -72,6 +72,14 @@ Based on feedback collected from our testers, we completed the following major d
 * **What We Did:** Implemented a fully responsive **Dark Mode** across the entire application with a persistent theme toggle. Updated all pages, components, cards, navigation, forms, buttons, and interactive elements to support both light and dark themes while maintaining consistent contrast, readability, and accessibility. The selected theme is automatically remembered across user sessions, providing a seamless and personalized user experience.
 
 * **Git Commit:** [feat: add dark mode toggle across the application](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commit/d58d509)
+### 🔹 Iteration 5: Advanced UX and Engagement Features
+
+* **Feedback Received:** *"The app needs to track my highest score and feel more like a real competitive game. Also, if my browser crashes, I lose my quiz progress and entry fee!"*
+
+* **What We Did:** Implemented a **15-second per-question countdown timer** to introduce competitive pressure. Added robust **Local Storage Persistence** so users can refresh the page without losing their quiz progress or repurchasing entry. Finally, added a prominent **Friendbot Funding button** directly in the top Navbar for new testnet users, and persistent **Highest Score Tracking** on the dashboard.
+
+* **Git Commits:** Multiple atomic commits capturing these feature updates.
+
 ---
 
 ## 🚀 Future Evolution Plan (Next Phase)
@@ -82,16 +90,12 @@ Based on the aggregated feedback collected from our 50+ testnet users, here is o
 | Priority | Improvement | Driven By |
 |:---|:---|:---|
 | 🔴 High | Add a visible transaction confirmation modal with a loading spinner so users don't re-click | 35% of testers reported confusion after submitting |
-| 🔴 High | Add testnet wallet funding shortcut (Friendbot) prominently on the home screen | 40% of new users struggled with getting testnet XLM |
-| 🟡 Medium | Persist quiz progress in `localStorage` so a browser refresh doesn't reset answers | Common feedback from testers with slow connections |
-| 🟡 Medium | Display wallet balance directly in the UI header | Users wanted to see their XLM before paying the entry fee |
 
 ### 📌 Phase 2 — New Features (Short-term)
 | Priority | Feature | Description |
 |:---|:---|:---|
 | 🔴 High | **Global On-chain Leaderboard** | Display top-10 scores across all users pulled directly from contract storage |
 | 🟡 Medium | **Quiz Categories** | Allow admin to tag questions by topic (Science, Crypto, History) and let users choose |
-| 🟡 Medium | **Timed Mode** | Introduce a countdown timer per question to add competitive pressure |
 | 🟢 Low | **NFT Achievement Badges** | Mint Stellar-based NFTs as rewards for users who score 100% |
 
 ### 📌 Phase 3 — Mainnet Vision (Long-term)
@@ -141,8 +145,10 @@ The project uses **GitHub Actions** to automatically run on every push and pull 
 - 📱 **Premium UI:** Fully responsive, dark-mode glassmorphism design.
 - 🔐 **Multi-Wallet Support:** Fully compatible with **Freighter** (extension), **Albedo** (web popup), **xBull**, and **Hana** wallets.
 - ⚡ **Real-Time Event Tracking:** Uses Soroban contract events (`quiz_ans`) to instantly confirm transactions and update the UI.
-- 💧 **Friendbot Integration:** 1-click funding for new testnet accounts directly from the UI.
-- 🏆 **On-chain Leaderboard:** Top-5 scores stored and sorted by the smart contract itself via bubble sort.
+- ⏱️ **Competitive Timed Mode:** 15-second per-question countdown timer forcing users to think fast.
+- 💾 **Local Storage Persistence:** Users can refresh the page without losing their quiz progress or entry fee.
+- 💧 **Prominent Friendbot Integration:** 1-click funding for new testnet accounts directly from the UI navbar.
+- 🏆 **On-chain Leaderboard & Personal Bests:** Top-5 scores stored via smart contract, with highest personal scores tracked locally.
 - 📊 **Vitest Frontend Tests:** 8/8 tests passing, covering wallet connection, signing, and error handling.
 
 ---
@@ -314,7 +320,6 @@ Tests       8 passed (8)
 
 - [ ] **NFT Achievement Badges:** Mint unique Stellar-based collectibles for users who score 100%.
 - [ ] **Global On-chain Leaderboard:** Surface top scores from all users directly from contract storage.
-- [ ] **Timed Quizzes:** Introduce per-question countdowns for a competitive, arcade feel.
 - [ ] **Quiz Categories:** Tag questions by topic (Science, Crypto, History) and let users filter.
 - [ ] **Token Rewards:** Issue a native Stellar quiz reward token for top performers.
 - [ ] **DAO Governance:** Let token holders vote on new question sets and contract upgrades.
