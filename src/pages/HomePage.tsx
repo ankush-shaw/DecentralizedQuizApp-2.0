@@ -158,21 +158,6 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                   )}
                 </div>
 
-                {(wallet.balance === '0.00' || !wallet.balance || parseFloat(wallet.balance) < 1) && (
-                  <button
-                    onClick={async () => {
-                      try {
-                        const res = await fetch(`https://friendbot.stellar.org?addr=${wallet.address}`);
-                        if (res.ok) alert('Success! Account funded. Please refresh the page.');
-                      } catch {
-                        alert('Friendbot busy. Try again.');
-                      }
-                    }}
-                    className="text-xs text-brand-500 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 hover:underline font-medium transition-colors"
-                  >
-                    New account? Click to Fund with Friendbot ↗
-                  </button>
-                )}
               </motion.div>
             ) : (
               <motion.div
