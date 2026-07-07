@@ -68,6 +68,8 @@ export function QuizPage({
     setResults,
     answeredIds,
     setAnsweredIds,
+    highestScore,
+    setHighestScore,
     clearQuizState
   } = useQuizState(userAddress);
   
@@ -288,6 +290,9 @@ export function QuizPage({
           const events = await listenForQuizEvents(ledgerAtStart);
           if (events.length > 0) setRecentEvents(events);
         } catch {}
+        if (score > highestScore) {
+          setHighestScore(score);
+        }
         clearQuizState();
         onComplete(score, questions.length, hash);
       } catch (e: unknown) {
