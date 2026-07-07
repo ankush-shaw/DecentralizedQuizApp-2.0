@@ -24,6 +24,7 @@ import {
 } from '../services/errors';
 import type { Question, QuizResult, QuizEvent, TxStatus } from '../types';
 import type { Theme } from '../hooks/useTheme';
+import { useQuizState } from '../hooks/useQuizState';
 import quizData from '../data/questions.json';
 
 const QUIZ_QUESTIONS = quizData as Question[];
@@ -56,14 +57,22 @@ export function QuizPage({
   theme,
   onToggleTheme,
 }: QuizPageProps) {
-  const [isPaid, setIsPaid] = useState(false);
+  const {
+    isPaid,
+    setIsPaid,
+    currentIndex,
+    setCurrentIndex,
+    results,
+    setResults,
+    answeredIds,
+    setAnsweredIds,
+    clearQuizState
+  } = useQuizState(userAddress);
+  
   const [isPaying, setIsPaying] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [results, setResults] = useState<Record<number, QuizResult>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<string | null>(null);
-  const [answeredIds, setAnsweredIds] = useState<Set<number>>(new Set());
   const [recentEvents, setRecentEvents] = useState<QuizEvent[]>([]);
   const [ledgerAtStart, setLedgerAtStart] = useState<number | undefined>(undefined);
 
@@ -243,6 +252,7 @@ export function QuizPage({
           const events = await listenForQuizEvents(ledgerAtStart);
           if (events.length > 0) setRecentEvents(events);
         } catch {}
+        clearQuizState();
         onComplete(score, questions.length, hash);
       } catch (e: unknown) {
         const { message, type } = classifyError(e);
