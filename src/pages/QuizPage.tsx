@@ -8,6 +8,7 @@ import {
   Coins,
   AlertCircle,
   Zap,
+  Clock,
 } from 'lucide-react';
 import { QuestionCard } from '../components/QuestionCard';
 import { ThemeToggle } from '../components/ThemeToggle';
@@ -27,6 +28,7 @@ import type { Theme } from '../hooks/useTheme';
 import { useQuizState } from '../hooks/useQuizState';
 import quizData from '../data/questions.json';
 
+const TIME_PER_QUESTION = 15;
 const QUIZ_QUESTIONS = quizData as Question[];
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -75,6 +77,38 @@ export function QuizPage({
   const [errorType, setErrorType] = useState<string | null>(null);
   const [recentEvents, setRecentEvents] = useState<QuizEvent[]>([]);
   const [ledgerAtStart, setLedgerAtStart] = useState<number | undefined>(undefined);
+  const [timeLeft, setTimeLeft] = useState(TIME_PER_QUESTION);
+
+  useEffect(() => {
+    setTimeLeft(TIME_PER_QUESTION);
+  }, [currentIndex]);
+
+  useEffect(() => {
+    if (!isPaid || !userAddress || isSubmitting) return;
+    if (answeredIds.has(currentQuestion.id)) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [currentIndex, isPaid, userAddress, answeredIds, currentQuestion.id, isSubmitting]);
+
+  useEffect(() => {
+    if (timeLeft === 0 && !answeredIds.has(currentQuestion.id)) {
+      setResults((prev) => ({
+        ...prev,
+        [currentQuestion.id]: { questionId: currentQuestion.id, userAnswer: '__TIMEOUT__', correct: false },
+      }));
+      setAnsweredIds((prev) => new Set([...prev, currentQuestion.id]));
+    }
+  }, [timeLeft, currentQuestion.id, answeredIds, setResults, setAnsweredIds]);
 
   const [questions] = useState<Question[]>(() =>
     shuffleArray(QUIZ_QUESTIONS.slice(0, 15))
@@ -302,6 +336,22 @@ export function QuizPage({
                   }`}
                 />
               ))}
+            </div>
+          </div>
+
+          {/* Timer */}
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-semibold flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+                <Clock size={16} className={timeLeft <= 5 ? "text-red-500 animate-pulse" : "text-brand-500"} />
+                {timeLeft}s remaining
+              </span>
+            </div>
+            <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div 
+                className={`h-full transition-all duration-1000 ease-linear ${timeLeft <= 5 ? 'bg-red-500' : 'bg-brand-500'}`} 
+                style={{ width: `${(timeLeft / TIME_PER_QUESTION) * 100}%` }}
+              />
             </div>
           </div>
 
