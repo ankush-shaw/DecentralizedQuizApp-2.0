@@ -8,6 +8,7 @@ import { Leaderboard } from '../components/Leaderboard';
 import { LiveEventTicker } from '../components/LiveEventTicker';
 import { ThemeToggle } from '../components/ThemeToggle';
 import type { Theme } from '../hooks/useTheme';
+import { useQuizState } from '../hooks/useQuizState';
 
 interface HomePageProps {
   wallet: WalletState;
@@ -24,6 +25,7 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
+  const { highestScore } = useQuizState(wallet.address || '');
 
   useEffect(() => {
     async function checkCount() {
@@ -203,12 +205,13 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-3 gap-4 mb-16"
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16"
         >
           {[
             { label: 'Quiz Questions', value: totalQuizzes !== null ? totalQuizzes.toString() : '—' },
             { label: 'Network', value: 'Stellar' },
             { label: 'Entry Fee', value: '1 XLM' },
+            { label: 'Your Best', value: highestScore > 0 ? highestScore.toString() : '—' },
           ].map((stat, i) => (
             <div key={i} className="glass p-5 text-center">
               <div className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-1">{stat.value}</div>
