@@ -74,6 +74,22 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
         <div className="flex items-center gap-3">
           {wallet.isConnected && wallet.address ? (
             <div className="flex items-center gap-3">
+              {(wallet.balance === '0.00' || !wallet.balance || parseFloat(wallet.balance) < 1) && (
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(`https://friendbot.stellar.org?addr=${wallet.address}`);
+                      if (res.ok) alert('Success! Account funded. Please refresh the page.');
+                    } catch {
+                      alert('Friendbot busy. Try again.');
+                    }
+                  }}
+                  className="text-xs font-semibold bg-brand-100 hover:bg-brand-200 text-brand-700 dark:bg-brand-900/50 dark:hover:bg-brand-800 dark:text-brand-300 px-3 py-1.5 rounded-lg transition-colors border border-brand-200 dark:border-brand-700 shadow-sm flex items-center gap-1"
+                  title="Get free testnet XLM"
+                >
+                  <Zap size={12} className="text-brand-500" /> Fund Wallet
+                </button>
+              )}
               {wallet.balance && (
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
                   {wallet.balance} XLM
