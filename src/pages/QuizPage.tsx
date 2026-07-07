@@ -79,6 +79,15 @@ export function QuizPage({
   const [ledgerAtStart, setLedgerAtStart] = useState<number | undefined>(undefined);
   const [timeLeft, setTimeLeft] = useState(TIME_PER_QUESTION);
 
+  const [questions] = useState<Question[]>(() =>
+    shuffleArray(QUIZ_QUESTIONS.slice(0, 15))
+      .slice(0, 10)
+      .map((q) => ({ ...q, options: shuffleArray(q.options) }))
+  );
+
+  const currentQuestion = questions[currentIndex];
+  const isLastQuestion = currentIndex === questions.length - 1;
+
   useEffect(() => {
     setTimeLeft(TIME_PER_QUESTION);
   }, [currentIndex]);
@@ -110,14 +119,7 @@ export function QuizPage({
     }
   }, [timeLeft, currentQuestion.id, answeredIds, setResults, setAnsweredIds]);
 
-  const [questions] = useState<Question[]>(() =>
-    shuffleArray(QUIZ_QUESTIONS.slice(0, 15))
-      .slice(0, 10)
-      .map((q) => ({ ...q, options: shuffleArray(q.options) }))
-  );
 
-  const currentQuestion = questions[currentIndex];
-  const isLastQuestion = currentIndex === questions.length - 1;
 
   const captureLedger = useCallback(async () => {
     try {
