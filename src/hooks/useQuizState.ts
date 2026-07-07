@@ -6,6 +6,7 @@ interface QuizState {
   currentIndex: number;
   results: Record<number, QuizResult>;
   answeredIds: number[];
+  highestScore: number;
 }
 
 const STORAGE_KEY = 'dquiz_progress_v1';
@@ -44,6 +45,10 @@ export function useQuizState(userAddress: string) {
     return loaded ? new Set(loaded) : new Set();
   });
 
+  const [highestScore, setHighestScore] = useState<number>(() => {
+    return loadState()?.highestScore ?? 0;
+  });
+
   // Save state whenever it changes
   useEffect(() => {
     if (userAddress) {
@@ -52,6 +57,7 @@ export function useQuizState(userAddress: string) {
         currentIndex,
         results,
         answeredIds: Array.from(answeredIds),
+        highestScore,
       };
       try {
         localStorage.setItem(key, JSON.stringify(stateToSave));
@@ -59,11 +65,14 @@ export function useQuizState(userAddress: string) {
         console.error('Failed to save quiz state', e);
       }
     }
-  }, [isPaid, currentIndex, results, answeredIds, userAddress, key]);
+  }, [isPaid, currentIndex, results, answeredIds, highestScore, userAddress, key]);
 
   const clearQuizState = () => {
     try {
+      // We do NOT clear highestScore when clearing the current quiz run!
+      const currentHighest = highestScore;
       localStorage.removeItem(key);
+      setHighestScore(currentHighest);
     } catch (e) {
       console.error('Failed to clear quiz state', e);
     }
@@ -82,6 +91,8 @@ export function useQuizState(userAddress: string) {
     setResults,
     answeredIds,
     setAnsweredIds,
+    highestScore,
+    setHighestScore,
     clearQuizState,
   };
 }
