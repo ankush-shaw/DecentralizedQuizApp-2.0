@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Github, ExternalLink, Shield, Brain, Layers, Zap } from 'lucide-react';
 import type { WalletState } from '../types';
-import { getTotalQuizzes, getLeaderboard, CONTRACT_ID } from '../services/soroban';
+import { getTotalQuizzes, getLeaderboard, CONTRACT_ID, getIsTestnet } from '../services/soroban';
 import type { WalletType } from '../services/soroban';
 import { Leaderboard } from '../components/Leaderboard';
 import { LiveEventTicker } from '../components/LiveEventTicker';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { NetworkSwitcher } from '../components/NetworkSwitcher';
 import type { Theme } from '../hooks/useTheme';
 import { useQuizState } from '../hooks/useQuizState';
+import type { NetworkName } from '../config/networks';
 
 interface HomePageProps {
   wallet: WalletState;
@@ -18,9 +20,11 @@ interface HomePageProps {
   onInitialize: () => Promise<void>;
   theme: Theme;
   onToggleTheme: () => void;
+  activeNetwork: NetworkName;
+  onSwitchNetwork: (network: NetworkName) => void;
 }
 
-export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onInitialize, theme, onToggleTheme }: HomePageProps) {
+export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onInitialize, theme, onToggleTheme, activeNetwork, onSwitchNetwork }: HomePageProps) {
   const [totalQuizzes, setTotalQuizzes] = useState<number | null>(null);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
@@ -71,12 +75,15 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
             <Zap size={16} className="text-white" />
           </div>
           <span className="font-bold text-slate-800 dark:text-slate-100 text-sm tracking-tight">DQuiz</span>
-          <span className="badge bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 border border-brand-100 dark:border-brand-900 ml-1">Testnet</span>
+          <span className={`badge border ml-1 ${activeNetwork === 'MAINNET' ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900' : 'bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 border-brand-100 dark:border-brand-900'}`}>
+            {activeNetwork === 'MAINNET' ? 'Mainnet' : 'Testnet'}
+          </span>
         </div>
         <div className="flex items-center gap-3">
+          <NetworkSwitcher activeNetwork={activeNetwork} onSwitch={onSwitchNetwork} />
           {wallet.isConnected && wallet.address ? (
             <div className="flex items-center gap-3">
-              {(wallet.balance === '0.00' || !wallet.balance || parseFloat(wallet.balance) < 1) && (
+              {(wallet.balance === '0.00' || !wallet.balance || parseFloat(wallet.balance) < 1) && getIsTestnet() && (
                 <button
                   onClick={async () => {
                     try {

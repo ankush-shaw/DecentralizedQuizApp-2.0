@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useWallet } from './hooks/useWallet';
 import { useTheme } from './hooks/useTheme';
 import { initializeContract } from './services/soroban';
+import { getActiveNetworkName, setActiveNetwork } from './config/networks';
+import type { NetworkName } from './config/networks';
 import { HomePage } from './pages/HomePage';
 import { QuizPage } from './pages/QuizPage';
 import { ResultPage } from './pages/ResultPage';
@@ -29,6 +31,14 @@ function App() {
   const { theme, toggleTheme } = useTheme();
   const [page, setPage] = useState<Page>('home');
   const [outcome, setOutcome] = useState<QuizOutcome | null>(null);
+  const [activeNetwork, setNetwork] = useState<NetworkName>(() => getActiveNetworkName());
+
+  const handleNetworkSwitch = useCallback((network: NetworkName) => {
+    setActiveNetwork(network);
+    setNetwork(network);
+    // Reload the app data for the new network
+    window.location.reload();
+  }, []);
 
   /** Global transaction status — shown as a floating panel across all pages */
   const [txStatus, setTxStatus] = useState<TxStatus>(DEFAULT_TX_STATUS);
@@ -97,6 +107,8 @@ function App() {
                 onInitialize={handleInitialize}
                 theme={theme}
                 onToggleTheme={toggleTheme}
+                activeNetwork={activeNetwork}
+                onSwitchNetwork={handleNetworkSwitch}
               />
             </motion.div>
           )}
