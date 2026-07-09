@@ -26,18 +26,31 @@ import {
   ContractCallError,
 } from './errors';
 import type { QuizEvent } from '../types';
+import { getActiveConfig, type NetworkName } from '../config/networks';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-export const CONTRACT_ID = 'CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A';
-export const NETWORK_PASSPHRASE = Networks.TESTNET;
-export const RPC_URL = 'https://soroban-testnet.stellar.org';
+// Dynamic: reads from localStorage (set by the NetworkSwitcher UI)
+// Defaults to Testnet if not set
+function cfg() { return getActiveConfig(); }
+
+export function getNetworkName(): NetworkName { return cfg().name; }
+export function getContractId(): string { return cfg().contractId; }
+export function getNetworkPassphrase(): string { return cfg().passphrase; }
+export function getRpcUrl(): string { return cfg().rpcUrl; }
+export function getHorizonUrl(): string { return cfg().horizonUrl; }
+export function getIsTestnet(): boolean { return cfg().isTestnet; }
+
+// Legacy named exports kept for backwards compatibility in components that import them
+export const CONTRACT_ID = 'CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A'; // Static testnet ID for explorer links
+export const NETWORK_PASSPHRASE = Networks.TESTNET; // kept for backwards compat
+export const RPC_URL = 'https://soroban-testnet.stellar.org'; // kept for backwards compat
 export const NATIVE_TOKEN = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';
 
-const server = new rpc.Server(RPC_URL);
-const quizContract = new Contract(CONTRACT_ID);
+function getServer() { return new rpc.Server(cfg().rpcUrl); }
+function getContract() { return new Contract(cfg().contractId); }
 
-console.log('--- DECENTRALIZED QUIZ APP v3.1.0 (Level 2) ---');
+console.log('--- DECENTRALIZED QUIZ APP v4.0.0 (Multi-Network) ---');
 
 // ─── Wallet ────────────────────────────────────────────────────────────────────
 
@@ -159,7 +172,7 @@ async function signWithHana(xdrStr: string): Promise<string | null> {
   try {
     const hana = (window as any).hanaWallet?.stellar;
     if (!hana) return null;
-    const result = await hana.signTransaction(xdrStr, { networkPassphrase: NETWORK_PASSPHRASE });
+    const result = await hana.signTransaction(xdrStr, { networkPassphrase: getNetworkPassphrase() });
     return result?.signedTxXdr || result || null;
   } catch (e: any) {
     if (e?.message?.toLowerCase().includes('cancel') || e?.message?.toLowerCase().includes('reject')) {
@@ -171,7 +184,8 @@ async function signWithHana(xdrStr: string): Promise<string | null> {
 
 async function signWithAlbedo(xdrStr: string): Promise<string | null> {
   try {
-    const res = await albedo.tx({ xdr: xdrStr, network: 'testnet' });
+    const network = getIsTestnet() ? 'testnet' : 'public';
+    const res = await albedo.tx({ xdr: xdrStr, network });
     return res.signed_envelope_xdr;
   } catch (e: any) {
     if (e?.message?.toLowerCase().includes('cancel') || e?.message?.toLowerCase().includes('reject')) {
@@ -194,7 +208,8 @@ async function signTx(preparedXdr: string): Promise<string | null> {
 
   // Default: Freighter
   try {
-    const signResult = await signTransaction(preparedXdr, { network: 'TESTNET' });
+    const network = getIsTestnet() ? 'TESTNET' : 'PUBLIC';
+    const signResult = await signTransaction(preparedXdr, { network });
     if (typeof signResult === 'object' && signResult !== null && 'error' in signResult) {
       throw new TransactionRejectedError(`Freighter: ${(signResult as any).error}`);
     }
@@ -221,7 +236,7 @@ export async function waitForTxConfirmation(
   intervalMs = 2000
 ): Promise<{ status: 'SUCCESS' | 'FAILED'; hash: string }> {
   for (let i = 0; i < maxAttempts; i++) {
-    const res = await fetch(RPC_URL, {
+    const res = await fetch(getRpcUrl(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -254,7 +269,7 @@ export async function listenForQuizEvents(startLedger?: number): Promise<QuizEve
     // Get current ledger if not provided
     let fromLedger = startLedger;
     if (!fromLedger) {
-      const latestRes = await fetch(RPC_URL, {
+      const latestRes = await fetch(getRpcUrl(), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getLatestLedger', params: {} }),
@@ -275,7 +290,7 @@ export async function listenForQuizEvents(startLedger?: number): Promise<QuizEve
           filters: [
             {
               type: 'contract',
-              contractIds: [CONTRACT_ID],
+              contractIds: [getContractId()],
               topics: [['*', '*']],
             },
           ],
@@ -323,7 +338,7 @@ export async function listenForQuizEvents(startLedger?: number): Promise<QuizEve
 
 export async function getXlmBalance(address: string): Promise<string | null> {
   try {
-    const response = await fetch(`https://horizon-testnet.stellar.org/accounts/${address}`);
+    const response = await fetch(`${getHorizonUrl()}/accounts/${address}`);
     if (!response.ok) return '0.00';
     const data = await response.json();
     const nativeBalance = data.balances.find((b: any) => b.asset_type === 'native');
@@ -390,6 +405,8 @@ export async function getLeaderboard(): Promise<{ address: string; score: number
 /** Helper for simulation (READ-only operations — no signing required) */
 async function simulateCall(funcName: string, args: any[]): Promise<any> {
   try {
+    const server = getServer();
+    const contract = getContract();
     const dummyPK = 'GBBIG4HLPGTLG6BH6YREVWJXEQ4NX74HTD444JD6A6XYS7DOFL2J6DEI';
     let account: any;
     try {
@@ -403,9 +420,9 @@ async function simulateCall(funcName: string, args: any[]): Promise<any> {
     }
     const tx = new TransactionBuilder(account, {
       fee: BASE_FEE,
-      networkPassphrase: NETWORK_PASSPHRASE,
+      networkPassphrase: getNetworkPassphrase(),
     })
-      .addOperation(quizContract.call(funcName, ...args))
+      .addOperation(contract.call(funcName, ...args))
       .setTimeout(30)
       .build();
 
@@ -431,10 +448,12 @@ export async function payEntryFee(userAddress: string): Promise<boolean> {
   let hash: string | undefined;
 
   try {
+    const server = getServer();
+    const quizContract = getContract();
     const account = await server.getAccount(userAddress);
     const tx = new TransactionBuilder(account, {
       fee: '1000000',
-      networkPassphrase: NETWORK_PASSPHRASE,
+      networkPassphrase: getNetworkPassphrase(),
     })
       .addOperation(
         quizContract.call(
@@ -458,7 +477,7 @@ export async function payEntryFee(userAddress: string): Promise<boolean> {
     if (!signedXdr) throw new TransactionRejectedError();
 
     const sent = await server.sendTransaction(
-      TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE)
+      TransactionBuilder.fromXDR(signedXdr, getNetworkPassphrase())
     );
     hash = (sent as any).hash;
 
@@ -490,6 +509,8 @@ export async function submitBatchAnswers(
   console.log(`[submitBatchAnswers] Submitting ${answers.length} answers…`);
 
   try {
+    const server = getServer();
+    const quizContract = getContract();
     const account = await server.getAccount(userAddress);
 
     const scAnswers = nativeToScVal(
@@ -501,7 +522,7 @@ export async function submitBatchAnswers(
 
     const tx = new TransactionBuilder(account, {
       fee: '1000000',
-      networkPassphrase: NETWORK_PASSPHRASE,
+      networkPassphrase: getNetworkPassphrase(),
     })
       .addOperation(
         quizContract.call(
@@ -524,7 +545,7 @@ export async function submitBatchAnswers(
     if (!signedXdr) throw new TransactionRejectedError();
 
     const sent = await server.sendTransaction(
-      TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE)
+      TransactionBuilder.fromXDR(signedXdr, getNetworkPassphrase())
     );
     hash = (sent as any).hash;
     console.log(`[submitBatchAnswers] tx hash: ${hash}`);
@@ -561,6 +582,8 @@ export async function initializeContract(userAddress: string): Promise<void> {
   console.log(`[seed] Initializing ${INITIAL_QUESTIONS.length} questions…`);
 
   try {
+    const server = getServer();
+    const quizContract = getContract();
     const account = await server.getAccount(userAddress);
 
     const scItems = nativeToScVal(
@@ -573,7 +596,7 @@ export async function initializeContract(userAddress: string): Promise<void> {
 
     const tx = new TransactionBuilder(account, {
       fee: '1000000',
-      networkPassphrase: NETWORK_PASSPHRASE,
+      networkPassphrase: getNetworkPassphrase(),
     })
       .addOperation(quizContract.call('create_quiz_batch', scItems))
       .setTimeout(30)
@@ -590,7 +613,7 @@ export async function initializeContract(userAddress: string): Promise<void> {
     if (!signedXdr) throw new TransactionRejectedError('Contract initialization was rejected.');
 
     const sent = await server.sendTransaction(
-      TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE)
+      TransactionBuilder.fromXDR(signedXdr, getNetworkPassphrase())
     );
 
     const result = await waitForTxConfirmation((sent as any).hash);
