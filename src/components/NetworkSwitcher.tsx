@@ -17,7 +17,7 @@ export function NetworkSwitcher({ activeNetwork, onSwitch }: NetworkSwitcherProp
 
   return (
     <div className="flex items-center gap-2" title={`Switch to ${isMainnet ? 'Testnet' : 'Mainnet'}`}>
-      <span className={`text-xs font-semibold transition-colors ${!isMainnet ? 'text-brand-600 dark:text-brand-400' : 'text-slate-400 dark:text-slate-500'}`}>
+      <span className={`text-xs font-semibold transition-colors hidden sm:inline ${!isMainnet ? 'text-brand-600 dark:text-brand-400' : 'text-slate-400 dark:text-slate-500'}`}>
         {NETWORKS.TESTNET.label}
       </span>
 
@@ -25,7 +25,7 @@ export function NetworkSwitcher({ activeNetwork, onSwitch }: NetworkSwitcherProp
         id="btn-network-switcher"
         onClick={handleToggle}
         aria-label={`Switch network (currently ${activeNetwork})`}
-        className={`relative w-11 h-6 rounded-full transition-all duration-300 border-2 focus:outline-none focus:ring-2 focus:ring-offset-1 ${
+        className={`relative w-11 h-6 rounded-full transition-all duration-300 border-2 focus:outline-none focus:ring-2 focus:ring-offset-1 flex-shrink-0 ${
           isMainnet
             ? 'bg-emerald-500 border-emerald-600 focus:ring-emerald-400'
             : 'bg-slate-200 dark:bg-slate-700 border-slate-300 dark:border-slate-600 focus:ring-brand-400'
@@ -42,12 +42,12 @@ export function NetworkSwitcher({ activeNetwork, onSwitch }: NetworkSwitcherProp
         />
       </button>
 
-      <span className={`text-xs font-semibold transition-colors ${isMainnet ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
+      <span className={`text-xs font-semibold transition-colors hidden sm:inline ${isMainnet ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
         {NETWORKS.MAINNET.label}
       </span>
 
       {isMainnet && (
-        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 px-1.5 py-0.5 rounded-md">
+        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 px-1.5 py-0.5 rounded-md flex-shrink-0">
           LIVE
         </span>
       )}

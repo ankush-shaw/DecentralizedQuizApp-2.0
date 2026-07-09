@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Github, ExternalLink, Shield, Brain, Layers, Zap } from 'lucide-react';
+import { ChevronRight, Github, ExternalLink, Shield, Brain, Layers, Zap, LogOut } from 'lucide-react';
 import type { WalletState } from '../types';
 import { getTotalQuizzes, getLeaderboard, CONTRACT_ID, getIsTestnet } from '../services/soroban';
 import type { WalletType } from '../services/soroban';
@@ -93,22 +93,28 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                       alert('Friendbot busy. Try again.');
                     }
                   }}
-                  className="text-xs font-semibold bg-brand-100 hover:bg-brand-200 text-brand-700 dark:bg-brand-900/50 dark:hover:bg-brand-800 dark:text-brand-300 px-3 py-1.5 rounded-lg transition-colors border border-brand-200 dark:border-brand-700 shadow-sm flex items-center gap-1"
+                  className="text-xs font-semibold bg-brand-100 hover:bg-brand-200 text-brand-700 dark:bg-brand-900/50 dark:hover:bg-brand-800 dark:text-brand-300 px-3 py-1.5 rounded-lg transition-colors border border-brand-200 dark:border-brand-700 shadow-sm flex items-center gap-1 flex-shrink-0"
                   title="Get free testnet XLM"
                 >
-                  <Zap size={12} className="text-brand-500" /> Fund Wallet
+                  <Zap size={12} className="text-brand-500" />
+                  <span className="hidden md:inline">Fund Wallet</span>
                 </button>
               )}
               {wallet.balance && (
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg hidden md:inline-block">
                   {wallet.balance} XLM
                 </span>
               )}
-              <span className="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
+              <span className="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg hidden sm:inline-block">
                 {wallet.address.slice(0, 6)}…{wallet.address.slice(-4)}
               </span>
-              <button onClick={onDisconnect} className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-medium transition-colors px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
-                Disconnect
+              <button 
+                onClick={onDisconnect} 
+                className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-medium transition-colors px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-1"
+                title="Disconnect Wallet"
+              >
+                <LogOut size={12} className="sm:hidden" />
+                <span className="hidden sm:inline">Disconnect</span>
               </button>
             </div>
           ) : (
