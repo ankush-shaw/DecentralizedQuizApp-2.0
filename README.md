@@ -319,11 +319,11 @@ Tests       8 passed (8)
 ## 🔮 Future Roadmap
 
 - [ ] **NFT Achievement Badges:** Mint unique Stellar-based collectibles for users who score 100%.
-- [x] **Global On-chain Leaderboard:** Surface top scores from all users directly from contract storage.
+- [ ] **Global On-chain Leaderboard:** Surface top scores from all users directly from contract storage.
 - [ ] **Quiz Categories:** Tag questions by topic (Science, Crypto, History) and let users filter.
 - [ ] **Token Rewards:** Issue a native Stellar quiz reward token for top performers.
 - [ ] **DAO Governance:** Let token holders vote on new question sets and contract upgrades.
-- [x] **Mainnet Deployment:** Fully audited Rust smart contract on Stellar Mainnet.
+- [ ] **Mainnet Deployment:** Fully audited Rust smart contract on Stellar Mainnet.
 - [ ] **PWA / Mobile App:** Progressive Web App wrapper for a native mobile experience.
 
 ---
