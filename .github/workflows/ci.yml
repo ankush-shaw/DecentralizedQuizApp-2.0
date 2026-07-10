@@ -19,6 +19,12 @@ jobs:
           targets: wasm32-unknown-unknown
           override: true
 
+      - name: Ensure wasm target
+        run: rustup target add wasm32-unknown-unknown --toolchain 1.88.0
+
+      - name: Add rust-src component
+        run: rustup component add rust-src --toolchain 1.88.0
+
       - name: Cache Cargo
         uses: actions/cache@v3
         with:
@@ -43,6 +49,12 @@ jobs:
           toolchain: 1.88.0
           targets: wasm32-unknown-unknown
           override: true
+
+      - name: Ensure wasm target
+        run: rustup target add wasm32-unknown-unknown --toolchain 1.88.0
+
+      - name: Add rust-src component
+        run: rustup component add rust-src --toolchain 1.88.0
 
       - name: Build Contract (WASM)
         run: |
