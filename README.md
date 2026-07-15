@@ -39,7 +39,8 @@ All 50+ users interacted directly with the deployed Soroban contract on Stellar 
 
 **[→ View Contract on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A)**
 
-*(Update this section with a screenshot of the contract's transaction history from Stellar.Expert once 50+ interactions are confirmed.)*
+<img width="1536" height="871" alt="image" src="https://github.com/user-attachments/assets/77e4765d-a99a-47be-b828-474a5b026830" />
+
 
 ---
 
