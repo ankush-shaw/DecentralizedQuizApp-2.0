@@ -20,7 +20,7 @@ A transparent, tamper-proof quiz platform built on the **Stellar Network** using
 | **Network** | Stellar Testnet |
 | **Explorer** | [View on Stellar.Expert](https://stellar.expert/explorer/testnet/contract/CARMZTNTQ3FQT2B3DTKB47P4LA4H3435NTO5FX26DSW24DSF2BU7X73A) |
 | **Token / Pool** | N/A — quiz scoring handled entirely on-chain via contract state |
-| **Commits** | 36+ meaningful commits — [View git log](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commits/main) |
+| **Commits** | 50+ meaningful commits — [View git log](https://github.com/ankush-shaw/DecentralizedQuizApp-2.0/commits/main) |
 
 ---
 
