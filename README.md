@@ -146,6 +146,7 @@ The project uses **GitHub Actions** to automatically run on every push and pull 
 - 📱 **Premium UI:** Fully responsive, dark-mode glassmorphism design.
 - 🔐 **Multi-Wallet Support:** Fully compatible with **Freighter** (extension), **Albedo** (web popup), **xBull**, and **Hana** wallets.
 - ⚡ **Real-Time Event Tracking:** Uses Soroban contract events (`quiz_ans`) to instantly confirm transactions and update the UI.
+- 🎯 **Quiz Categories & Topic Selection:** Filter quizzes by **Stellar & Crypto**, **Web3 & Tech**, **General Science**, or **Mixed All-Topics Mode**.
 - ⏱️ **Competitive Timed Mode:** 15-second per-question countdown timer forcing users to think fast.
 - 💾 **Local Storage Persistence:** Users can refresh the page without losing their quiz progress or entry fee.
 - 💧 **Prominent Friendbot Integration:** 1-click funding for new testnet accounts directly from the UI navbar.
@@ -321,7 +322,7 @@ Tests       8 passed (8)
 
 - [ ] **NFT Achievement Badges:** Mint unique Stellar-based collectibles for users who score 100%.
 - [x] **Global On-chain Leaderboard:** Surface top scores from all users directly from contract storage.
-- [ ] **Quiz Categories:** Tag questions by topic (Science, Crypto, History) and let users filter.
+- [x] **Quiz Categories:** Tag questions by topic (Science, Crypto, History) and let users filter.
 - [ ] **Token Rewards:** Issue a native Stellar quiz reward token for top performers.
 - [ ] **DAO Governance:** Let token holders vote on new question sets and contract upgrades.
 - [x] **Mainnet Deployment:** Fully audited Rust smart contract on Stellar Mainnet.
