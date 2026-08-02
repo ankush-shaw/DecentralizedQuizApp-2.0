@@ -1,4 +1,10 @@
-export type QuizCategory = 'All' | 'Stellar & Crypto' | 'Web3 & Tech' | 'General Science';
+export type QuizCategory =
+  | 'All'
+  | 'Stellar & Crypto'
+  | 'Web3 & Tech'
+  | 'History & Culture'
+  | 'General Science'
+  | 'Math & Logic';
 
 export interface Question {
   id: number;
