@@ -23,7 +23,7 @@ import {
   TransactionRejectedError,
   ContractCallError,
 } from '../services/errors';
-import type { Question, QuizResult, QuizEvent, TxStatus } from '../types';
+import type { Question, QuizResult, QuizEvent, TxStatus, QuizCategory } from '../types';
 import type { Theme } from '../hooks/useTheme';
 import { useQuizState } from '../hooks/useQuizState';
 import quizData from '../data/questions.json';
@@ -42,6 +42,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 interface QuizPageProps {
   userAddress: string;
+  selectedCategory?: QuizCategory;
   onComplete: (score: number, total: number, txHash: string | null) => void;
   onBack: () => void;
   onConnectWallet: (type: 'freighter' | 'albedo') => void;
@@ -52,6 +53,7 @@ interface QuizPageProps {
 
 export function QuizPage({
   userAddress,
+  selectedCategory = 'All',
   onComplete,
   onBack,
   onConnectWallet,
@@ -81,11 +83,18 @@ export function QuizPage({
   const [ledgerAtStart, setLedgerAtStart] = useState<number | undefined>(undefined);
   const [timeLeft, setTimeLeft] = useState(TIME_PER_QUESTION);
 
-  const [questions] = useState<Question[]>(() =>
-    shuffleArray(QUIZ_QUESTIONS.slice(0, 15))
+  const [questions] = useState<Question[]>(() => {
+    let pool = QUIZ_QUESTIONS;
+    if (selectedCategory && selectedCategory !== 'All') {
+      const filtered = pool.filter((q) => q.category === selectedCategory);
+      if (filtered.length > 0) {
+        pool = filtered;
+      }
+    }
+    return shuffleArray(pool)
       .slice(0, 10)
-      .map((q) => ({ ...q, options: shuffleArray(q.options) }))
-  );
+      .map((q) => ({ ...q, options: shuffleArray(q.options) }));
+  });
 
   const currentQuestion = questions[currentIndex];
   const isLastQuestion = currentIndex === questions.length - 1;

@@ -11,6 +11,12 @@ interface QuestionCardProps {
 export function QuestionCard({ question, onAnswer, selectedAnswer, disabled }: QuestionCardProps) {
   return (
     <div className="glass p-8 w-full max-w-2xl mx-auto">
+      {question.category && (
+        <div className="mb-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-brand-50 dark:bg-brand-950/60 border border-brand-200/60 dark:border-brand-800/60 text-brand-600 dark:text-brand-400 text-xs font-semibold">
+          <span>{question.category}</span>
+        </div>
+      )}
+
       {/* Question Text */}
       <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-7 leading-relaxed">
         {question.text}
