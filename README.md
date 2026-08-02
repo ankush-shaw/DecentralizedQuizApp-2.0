@@ -146,7 +146,7 @@ The project uses **GitHub Actions** to automatically run on every push and pull 
 - 📱 **Premium UI:** Fully responsive, dark-mode glassmorphism design.
 - 🔐 **Multi-Wallet Support:** Fully compatible with **Freighter** (extension), **Albedo** (web popup), **xBull**, and **Hana** wallets.
 - ⚡ **Real-Time Event Tracking:** Uses Soroban contract events (`quiz_ans`) to instantly confirm transactions and update the UI.
-- 🎯 **Quiz Categories & Topic Selection:** Filter quizzes by **Stellar & Crypto**, **Web3 & Tech**, **General Science**, or **Mixed All-Topics Mode**.
+- 🎯 **Expanded Quiz Categories & 315+ Question Bank:** Filter quizzes across **Stellar & Crypto**, **Web3 & Tech**, **History & Culture**, **General Science**, and **Math & Logic**.
 - ⏱️ **Competitive Timed Mode:** 15-second per-question countdown timer forcing users to think fast.
 - 💾 **Local Storage Persistence:** Users can refresh the page without losing their quiz progress or entry fee.
 - 💧 **Prominent Friendbot Integration:** 1-click funding for new testnet accounts directly from the UI navbar.
