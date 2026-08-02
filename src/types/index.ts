@@ -1,10 +1,11 @@
-// TypeScript types for the Quiz DApp
+export type QuizCategory = 'All' | 'Stellar & Crypto' | 'Web3 & Tech' | 'General Science';
 
 export interface Question {
   id: number;
   text: string;
   options: string[];
   correctAnswer: string;
+  category?: QuizCategory;
 }
 
 export interface QuizResult {
