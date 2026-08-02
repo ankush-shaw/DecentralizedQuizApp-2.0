@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Layers, Rocket, Cpu, Sparkles } from 'lucide-react';
+import { Layers, Rocket, Cpu, Sparkles, Landmark, Binary } from 'lucide-react';
 import type { QuizCategory } from '../types';
 
 interface CategorySelectorProps {
@@ -19,7 +19,7 @@ const CATEGORIES: {
   {
     id: 'All',
     name: 'All Topics',
-    desc: 'Mixed set of questions across all Web3 and general categories.',
+    desc: 'Mixed set across all Web3, science & math categories.',
     icon: Layers,
     color: 'from-brand-500/10 to-violet-500/10 border-brand-200/60 dark:border-brand-800/60 text-brand-600 dark:text-brand-400',
     badgeColor: 'bg-brand-100 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300',
@@ -27,7 +27,7 @@ const CATEGORIES: {
   {
     id: 'Stellar & Crypto',
     name: 'Stellar & Crypto',
-    desc: 'Soroban smart contracts, XLM, Stellar blockchain & DeFi.',
+    desc: 'Soroban smart contracts, XLM, Stellar & Web3.',
     icon: Rocket,
     color: 'from-blue-500/10 to-indigo-500/10 border-blue-200/60 dark:border-blue-800/60 text-blue-600 dark:text-blue-400',
     badgeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300',
@@ -35,18 +35,34 @@ const CATEGORIES: {
   {
     id: 'Web3 & Tech',
     name: 'Web3 & Tech',
-    desc: 'Computer science, software engineering & cryptography.',
+    desc: 'Computer science, software & cryptography.',
     icon: Cpu,
     color: 'from-purple-500/10 to-pink-500/10 border-purple-200/60 dark:border-purple-800/60 text-purple-600 dark:text-purple-400',
     badgeColor: 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300',
   },
   {
+    id: 'History & Culture',
+    name: 'History & Culture',
+    desc: 'World history, civilizations, revolutions & culture.',
+    icon: Landmark,
+    color: 'from-amber-500/10 to-orange-500/10 border-amber-200/60 dark:border-amber-800/60 text-amber-600 dark:text-amber-400',
+    badgeColor: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300',
+  },
+  {
     id: 'General Science',
     name: 'General Science',
-    desc: 'World history, geography, biology & general knowledge.',
+    desc: 'Biology, physics, geography & general knowledge.',
     icon: Sparkles,
     color: 'from-emerald-500/10 to-teal-500/10 border-emerald-200/60 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400',
     badgeColor: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
+  },
+  {
+    id: 'Math & Logic',
+    name: 'Math & Logic',
+    desc: 'Algebra, geometry, logic puzzles & calculus.',
+    icon: Binary,
+    color: 'from-rose-500/10 to-red-500/10 border-rose-200/60 dark:border-rose-800/60 text-rose-600 dark:text-rose-400',
+    badgeColor: 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300',
   },
 ];
 
@@ -66,7 +82,7 @@ export function CategorySelector({
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-3">
         {CATEGORIES.map((cat, i) => {
           const isSelected = selectedCategory === cat.id;
           const Icon = cat.icon;

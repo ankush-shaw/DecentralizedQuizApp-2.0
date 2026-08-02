@@ -40,7 +40,9 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
       'All': (quizData as Question[]).length,
       'Stellar & Crypto': 0,
       'Web3 & Tech': 0,
+      'History & Culture': 0,
       'General Science': 0,
+      'Math & Logic': 0,
     };
     (quizData as Question[]).forEach((q) => {
       if (q.category && q.category in counts) {
