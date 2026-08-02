@@ -5,6 +5,7 @@ import { useTheme } from './hooks/useTheme';
 import { initializeContract } from './services/soroban';
 import { getActiveNetworkName, setActiveNetwork } from './config/networks';
 import type { NetworkName } from './config/networks';
+import type { QuizCategory } from './types';
 import { HomePage } from './pages/HomePage';
 import { QuizPage } from './pages/QuizPage';
 import { ResultPage } from './pages/ResultPage';
@@ -32,6 +33,7 @@ function App() {
   const [page, setPage] = useState<Page>('home');
   const [outcome, setOutcome] = useState<QuizOutcome | null>(null);
   const [activeNetwork, setNetwork] = useState<NetworkName>(() => getActiveNetworkName());
+  const [selectedCategory, setSelectedCategory] = useState<QuizCategory>('All');
 
   const handleNetworkSwitch = useCallback((network: NetworkName) => {
     setActiveNetwork(network);
@@ -109,6 +111,8 @@ function App() {
                 onToggleTheme={toggleTheme}
                 activeNetwork={activeNetwork}
                 onSwitchNetwork={handleNetworkSwitch}
+                selectedCategory={selectedCategory}
+                onSelectCategory={setSelectedCategory}
               />
             </motion.div>
           )}
@@ -122,6 +126,7 @@ function App() {
             >
               <QuizPage
                 userAddress={wallet.address ?? ''}
+                selectedCategory={selectedCategory}
                 onComplete={handleQuizComplete}
                 onBack={() => setPage('home')}
                 onConnectWallet={connect}

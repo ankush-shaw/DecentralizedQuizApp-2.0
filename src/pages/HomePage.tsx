@@ -1,16 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Github, ExternalLink, Shield, Brain, Layers, Zap, LogOut } from 'lucide-react';
-import type { WalletState } from '../types';
+import type { WalletState, QuizCategory, Question } from '../types';
 import { getTotalQuizzes, getLeaderboard, CONTRACT_ID, getIsTestnet } from '../services/soroban';
 import type { WalletType } from '../services/soroban';
 import { Leaderboard } from '../components/Leaderboard';
 import { LiveEventTicker } from '../components/LiveEventTicker';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { NetworkSwitcher } from '../components/NetworkSwitcher';
+import { CategorySelector } from '../components/CategorySelector';
 import type { Theme } from '../hooks/useTheme';
 import { useQuizState } from '../hooks/useQuizState';
 import type { NetworkName } from '../config/networks';
+import quizData from '../data/questions.json';
 
 interface HomePageProps {
   wallet: WalletState;
@@ -22,14 +24,31 @@ interface HomePageProps {
   onToggleTheme: () => void;
   activeNetwork: NetworkName;
   onSwitchNetwork: (network: NetworkName) => void;
+  selectedCategory: QuizCategory;
+  onSelectCategory: (category: QuizCategory) => void;
 }
 
-export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onInitialize, theme, onToggleTheme, activeNetwork, onSwitchNetwork }: HomePageProps) {
+export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onInitialize, theme, onToggleTheme, activeNetwork, onSwitchNetwork, selectedCategory, onSelectCategory }: HomePageProps) {
   const [totalQuizzes, setTotalQuizzes] = useState<number | null>(null);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
   const { highestScore } = useQuizState(wallet.address || '');
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<QuizCategory, number> = {
+      'All': (quizData as Question[]).length,
+      'Stellar & Crypto': 0,
+      'Web3 & Tech': 0,
+      'General Science': 0,
+    };
+    (quizData as Question[]).forEach((q) => {
+      if (q.category && q.category in counts) {
+        counts[q.category as QuizCategory]++;
+      }
+    });
+    return counts;
+  }, []);
 
   useEffect(() => {
     async function checkCount() {
@@ -212,6 +231,13 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
             )}
           </AnimatePresence>
         </motion.div>
+
+        {/* Category Selector */}
+        <CategorySelector
+          selectedCategory={selectedCategory}
+          onSelectCategory={onSelectCategory}
+          categoryCounts={categoryCounts}
+        />
 
         {/* Stats Strip */}
         <motion.div
