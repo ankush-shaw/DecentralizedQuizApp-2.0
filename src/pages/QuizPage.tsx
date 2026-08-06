@@ -43,7 +43,7 @@ function shuffleArray<T>(array: T[]): T[] {
 interface QuizPageProps {
   userAddress: string;
   selectedCategory?: QuizCategory;
-  onComplete: (score: number, total: number, txHash: string | null) => void;
+  onComplete: (score: number, total: number, txHash: string | null, detailedResults?: QuizResult[]) => void;
   onBack: () => void;
   onConnectWallet: (type: 'freighter' | 'albedo') => void;
   setTxStatus: (status: TxStatus) => void;
