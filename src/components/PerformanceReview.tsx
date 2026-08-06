@@ -17,6 +17,14 @@ export function PerformanceReview({ results }: PerformanceReviewProps) {
   const incorrectCount = results.length - correctCount - timedOutCount;
   const accuracy = Math.round((correctCount / results.length) * 100);
 
+  // Per-category accuracy
+  const categoryStats = results.reduce<Record<string, { correct: number; total: number }>>((acc, r) => {
+    const cat = r.category || 'Uncategorized';
+    if (!acc[cat]) acc[cat] = { correct: 0, total: 0 };
+    acc[cat].total++;
+    if (r.correct) acc[cat].correct++;
+    return acc;
+  }, {});
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -59,6 +67,38 @@ export function PerformanceReview({ results }: PerformanceReviewProps) {
           </div>
         </div>
       </div>
+
+      {/* Category Performance Bars */}
+      {Object.keys(categoryStats).length > 1 && (
+        <div className="glass p-5 mb-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+            Category Breakdown
+          </h4>
+          <div className="space-y-2.5">
+            {Object.entries(categoryStats).map(([cat, { correct, total }]) => {
+              const pct = Math.round((correct / total) * 100);
+              return (
+                <div key={cat}>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 truncate">{cat}</span>
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">{correct}/{total} ({pct}%)</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.8, ease: 'easeOut' }}
+                      className={`h-full rounded-full ${
+                        pct === 100 ? 'bg-emerald-500' : pct >= 60 ? 'bg-brand-500' : 'bg-amber-500'
+                      }`}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Expand/Collapse Toggle */}
       <button
