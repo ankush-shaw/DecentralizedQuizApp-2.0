@@ -1,4 +1,4 @@
-import { Trophy, Star, Zap } from 'lucide-react';
+import { Trophy, Star, Zap, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ScoreDisplayProps {
@@ -17,6 +17,24 @@ export function ScoreDisplay({ score, total, address, onPlayAgain }: ScoreDispla
     if (percentage >= 60) return { text: 'Good Job! 👍', color: 'text-brand-600' };
     if (percentage >= 40) return { text: 'Keep Practicing! 💪', color: 'text-orange-500' };
     return { text: 'Better luck next time! 🎯', color: 'text-rose-500' };
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'DQuiz — Blockchain Quiz Result',
+      text: `🧠 I scored ${score}/${total} (${percentage}%) on the Decentralized Quiz App! My score is verified on-chain on the Stellar Network. Try it yourself!`,
+      url: 'https://decentralized-quiz-app.vercel.app/',
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+        alert('Result copied to clipboard!');
+      }
+    } catch {
+      // User cancelled share
+    }
   };
 
   const { text, color } = getMessage();
@@ -74,15 +92,27 @@ export function ScoreDisplay({ score, total, address, onPlayAgain }: ScoreDispla
         <p className="font-mono text-xs text-slate-400 dark:text-slate-500 truncate">{address}</p>
       </div>
 
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={onPlayAgain}
-        className="btn-primary mt-7 w-full justify-center"
-      >
-        <Star size={16} />
-        Play Again
-      </motion.button>
+      <div className="flex gap-3 mt-7">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onPlayAgain}
+          className="btn-primary flex-1 justify-center"
+        >
+          <Star size={16} />
+          Play Again
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleShare}
+          className="btn-ghost justify-center px-4"
+          title="Share your result"
+        >
+          <Share2 size={16} />
+        </motion.button>
+      </div>
     </motion.div>
   );
 }
+
