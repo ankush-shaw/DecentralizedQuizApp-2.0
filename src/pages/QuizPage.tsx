@@ -124,7 +124,15 @@ export function QuizPage({
     if (timeLeft === 0 && !answeredIds.has(currentQuestion.id)) {
       setResults((prev) => ({
         ...prev,
-        [currentQuestion.id]: { questionId: currentQuestion.id, userAnswer: '__TIMEOUT__', correct: false },
+        [currentQuestion.id]: {
+          questionId: currentQuestion.id,
+          questionText: currentQuestion.text,
+          userAnswer: '__TIMEOUT__',
+          correctAnswer: currentQuestion.correctAnswer,
+          correct: false,
+          timedOut: true,
+          category: currentQuestion.category,
+        },
       }));
       setAnsweredIds((prev) => new Set([...prev, currentQuestion.id]));
     }
@@ -276,7 +284,15 @@ export function QuizPage({
     const correct = answer === currentQuestion.correctAnswer;
     setResults((prev) => ({
       ...prev,
-      [currentQuestion.id]: { questionId: currentQuestion.id, userAnswer: answer, correct },
+      [currentQuestion.id]: {
+        questionId: currentQuestion.id,
+        questionText: currentQuestion.text,
+        userAnswer: answer,
+        correctAnswer: currentQuestion.correctAnswer,
+        correct,
+        timedOut: false,
+        category: currentQuestion.category,
+      },
     }));
     setAnsweredIds((prev) => new Set([...prev, currentQuestion.id]));
   };
@@ -303,7 +319,11 @@ export function QuizPage({
           setHighestScore(score);
         }
         clearQuizState();
-        onComplete(score, questions.length, hash);
+        const detailedResults = questions.map((q) => results[q.id] || {
+          questionId: q.id, questionText: q.text, userAnswer: '', correctAnswer: q.correctAnswer,
+          correct: false, timedOut: false, category: q.category,
+        });
+        onComplete(score, questions.length, hash, detailedResults);
       } catch (e: unknown) {
         const { message, type } = classifyError(e);
         setError(message);
