@@ -5,7 +5,7 @@ import { useTheme } from './hooks/useTheme';
 import { initializeContract } from './services/soroban';
 import { getActiveNetworkName, setActiveNetwork } from './config/networks';
 import type { NetworkName } from './config/networks';
-import type { QuizCategory } from './types';
+import type { QuizCategory, QuizResult } from './types';
 import { HomePage } from './pages/HomePage';
 import { QuizPage } from './pages/QuizPage';
 import { ResultPage } from './pages/ResultPage';
@@ -18,6 +18,7 @@ interface QuizOutcome {
   score: number;
   total: number;
   txHash: string | null;
+  detailedResults: QuizResult[];
 }
 
 const DEFAULT_TX_STATUS: TxStatus = {
@@ -55,8 +56,8 @@ function App() {
     setPage('quiz');
   };
 
-  const handleQuizComplete = (score: number, total: number, txHash: string | null) => {
-    setOutcome({ score, total, txHash });
+  const handleQuizComplete = (score: number, total: number, txHash: string | null, detailedResults: QuizResult[] = []) => {
+    setOutcome({ score, total, txHash, detailedResults });
     setPage('result');
   };
 
@@ -149,6 +150,7 @@ function App() {
                 total={outcome.total}
                 address={wallet.address}
                 txHash={outcome.txHash}
+                detailedResults={outcome.detailedResults}
                 onPlayAgain={handlePlayAgain}
                 onHome={() => setPage('home')}
                 theme={theme}
