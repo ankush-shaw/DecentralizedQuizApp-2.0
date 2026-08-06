@@ -301,7 +301,7 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
             <span className="font-mono text-slate-300 dark:text-slate-600">v1.0.0</span>
           </div>
           <div className="flex items-center gap-5">
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+            <a href="https://github.com/ankush-shaw/DecentralizedQuizApp-2.0" target="_blank" rel="noreferrer" className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
               <Github size={18} />
             </a>
             <a
