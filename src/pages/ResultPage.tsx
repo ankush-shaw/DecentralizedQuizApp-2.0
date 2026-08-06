@@ -1,13 +1,17 @@
 import { ScoreDisplay } from '../components/ScoreDisplay';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { PerformanceReview } from '../components/PerformanceReview';
+import { NftAchievementBadge } from '../components/NftAchievementBadge';
 import { ExternalLink } from 'lucide-react';
 import type { Theme } from '../hooks/useTheme';
+import type { QuizResult } from '../types';
 
 interface ResultPageProps {
   score: number;
   total: number;
   address: string;
   txHash: string | null;
+  detailedResults?: QuizResult[];
   onPlayAgain: () => void;
   onHome: () => void;
   theme: Theme;
@@ -16,9 +20,9 @@ interface ResultPageProps {
 
 const TX_EXPLORER = 'https://stellar.expert/explorer/testnet/tx';
 
-export function ResultPage({ score, total, address, txHash, onPlayAgain, onHome, theme, onToggleTheme }: ResultPageProps) {
+export function ResultPage({ score, total, address, txHash, detailedResults = [], onPlayAgain, onHome, theme, onToggleTheme }: ResultPageProps) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-slate-50 dark:bg-slate-950 relative">
+    <div className="min-h-screen flex flex-col items-center px-6 py-12 bg-slate-50 dark:bg-slate-950 relative">
       <div className="absolute top-6 right-6">
         <ThemeToggle theme={theme} onToggle={onToggleTheme} />
       </div>
@@ -55,6 +59,17 @@ export function ResultPage({ score, total, address, txHash, onPlayAgain, onHome,
           </a>
         </div>
       )}
+
+      {/* NFT Achievement Badge */}
+      <NftAchievementBadge
+        score={score}
+        total={total}
+        address={address}
+        txHash={txHash}
+      />
+
+      {/* Performance Review */}
+      <PerformanceReview results={detailedResults} />
 
       <div className="mt-8 flex items-center gap-3">
         <button
