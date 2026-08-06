@@ -16,8 +16,23 @@ export interface Question {
 
 export interface QuizResult {
   questionId: number;
+  questionText: string;
   userAnswer: string;
+  correctAnswer: string;
   correct: boolean;
+  timedOut: boolean;
+  category?: QuizCategory;
+}
+
+// ─── Achievement Tiers ────────────────────────────────────────────────────────
+/** Achievement tier based on quiz performance percentage */
+export type AchievementTier = 'gold' | 'silver' | 'bronze' | 'none';
+
+export function getAchievementTier(percentage: number): AchievementTier {
+  if (percentage === 100) return 'gold';
+  if (percentage >= 80) return 'silver';
+  if (percentage >= 60) return 'bronze';
+  return 'none';
 }
 
 export interface LeaderboardEntry {
