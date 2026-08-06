@@ -151,6 +151,9 @@ The project uses **GitHub Actions** to automatically run on every push and pull 
 - 💾 **Local Storage Persistence:** Users can refresh the page without losing their quiz progress or entry fee.
 - 💧 **Prominent Friendbot Integration:** 1-click funding for new testnet accounts directly from the UI navbar.
 - 🏆 **On-chain Leaderboard & Personal Bests:** Top-5 scores stored via smart contract, with highest personal scores tracked locally.
+- 🏅 **Web3 NFT Achievement Badge & Certificate:** Animated modal with Gold/Silver/Bronze tier badges, on-chain certificate, and 1-click SIP-0016 NFT Metadata JSON copy.
+- 📊 **Detailed Performance Review:** Question-by-question accuracy breakdown with correct/incorrect/timed-out stats and expandable answer review.
+- 🚀 **Social Sharing:** Web Share API integration to share on-chain quiz scores with friends.
 - 📊 **Vitest Frontend Tests:** 8/8 tests passing, covering wallet connection, signing, and error handling.
 
 ---
@@ -320,7 +323,7 @@ Tests       8 passed (8)
 
 ## 🔮 Future Roadmap
 
-- [ ] **NFT Achievement Badges:** Mint unique Stellar-based collectibles for users who score 100%.
+- [x] **NFT Achievement Badges:** Mint unique Stellar-based collectibles for users who score 100%.
 - [x] **Global On-chain Leaderboard:** Surface top scores from all users directly from contract storage.
 - [x] **Quiz Categories:** Tag questions by topic (Science, Crypto, History) and let users filter.
 - [ ] **Token Rewards:** Issue a native Stellar quiz reward token for top performers.
