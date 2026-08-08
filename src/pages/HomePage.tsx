@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Github, ExternalLink, Shield, Brain, Layers, Zap, LogOut } from 'lucide-react';
+import { ChevronRight, Github, ExternalLink, Shield, Brain, Layers, Zap, LogOut, Swords, PenTool } from 'lucide-react';
 import type { WalletState, QuizCategory, Question } from '../types';
 import { getTotalQuizzes, getLeaderboard, CONTRACT_ID, getIsTestnet } from '../services/soroban';
 import type { WalletType } from '../services/soroban';
@@ -26,9 +26,11 @@ interface HomePageProps {
   onSwitchNetwork: (network: NetworkName) => void;
   selectedCategory: QuizCategory;
   onSelectCategory: (category: QuizCategory) => void;
+  onOpenBuilder: () => void;
+  onOpenArena: () => void;
 }
 
-export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onInitialize, theme, onToggleTheme, activeNetwork, onSwitchNetwork, selectedCategory, onSelectCategory }: HomePageProps) {
+export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onInitialize, theme, onToggleTheme, activeNetwork, onSwitchNetwork, selectedCategory, onSelectCategory, onOpenBuilder, onOpenArena }: HomePageProps) {
   const [totalQuizzes, setTotalQuizzes] = useState<number | null>(null);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
@@ -192,6 +194,18 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                       Initialize Contract
                     </button>
                   )}
+                </div>
+
+                {/* Challenge Buttons */}
+                <div className="flex items-center gap-3 flex-wrap justify-center">
+                  <button onClick={onOpenBuilder} className="btn-ghost text-sm group">
+                    <PenTool size={15} className="text-violet-500" />
+                    Create Quiz
+                  </button>
+                  <button onClick={onOpenArena} className="btn-ghost text-sm group">
+                    <Swords size={15} className="text-orange-500" />
+                    Challenge Arena
+                  </button>
                 </div>
 
               </motion.div>
