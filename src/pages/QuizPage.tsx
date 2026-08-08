@@ -43,6 +43,8 @@ function shuffleArray<T>(array: T[]): T[] {
 interface QuizPageProps {
   userAddress: string;
   selectedCategory?: QuizCategory;
+  customQuestions?: Question[] | null;
+  customTimePerQuestion?: number | null;
   onComplete: (score: number, total: number, txHash: string | null, detailedResults?: QuizResult[]) => void;
   onBack: () => void;
   onConnectWallet: (type: 'freighter' | 'albedo') => void;
@@ -54,6 +56,8 @@ interface QuizPageProps {
 export function QuizPage({
   userAddress,
   selectedCategory = 'All',
+  customQuestions: customQuestionsProp,
+  customTimePerQuestion,
   onComplete,
   onBack,
   onConnectWallet,
@@ -81,9 +85,16 @@ export function QuizPage({
   const [errorType, setErrorType] = useState<string | null>(null);
   const [recentEvents, setRecentEvents] = useState<QuizEvent[]>([]);
   const [ledgerAtStart, setLedgerAtStart] = useState<number | undefined>(undefined);
-  const [timeLeft, setTimeLeft] = useState(TIME_PER_QUESTION);
+
+  const effectiveTimePerQ = customTimePerQuestion || TIME_PER_QUESTION;
+  const [timeLeft, setTimeLeft] = useState(effectiveTimePerQ);
 
   const [questions] = useState<Question[]>(() => {
+    // Use custom questions if provided (from Challenge Arena)
+    if (customQuestionsProp && customQuestionsProp.length > 0) {
+      return customQuestionsProp.map((q) => ({ ...q, options: shuffleArray(q.options) }));
+    }
+    // Otherwise use standard quiz pool
     let pool = QUIZ_QUESTIONS;
     if (selectedCategory && selectedCategory !== 'All') {
       const filtered = pool.filter((q) => q.category === selectedCategory);
@@ -100,8 +111,8 @@ export function QuizPage({
   const isLastQuestion = currentIndex === questions.length - 1;
 
   useEffect(() => {
-    setTimeLeft(TIME_PER_QUESTION);
-  }, [currentIndex]);
+    setTimeLeft(effectiveTimePerQ);
+  }, [currentIndex, effectiveTimePerQ]);
 
   useEffect(() => {
     if (!isPaid || !userAddress || isSubmitting) return;
