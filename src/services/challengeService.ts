@@ -48,13 +48,16 @@ export function decodePayload(payload: ChallengePayload): { title: string; categ
     category: (payload.c || 'All') as QuizCategory,
     timePerQuestion: payload.tp || 15,
     creator: payload.cr || 'Unknown',
-    questions: payload.q.map((tuple, i) => ({
-      id: 1000 + i,
-      text: tuple[0],
-      options: [tuple[1], tuple[2], tuple[3], tuple[4]],
-      correctAnswer: tuple[tuple[5]] || tuple[1],
-      category: (payload.c || 'All') as QuizCategory,
-    })),
+    questions: payload.q.map((tuple, i) => {
+      const options = [tuple[1], tuple[2], tuple[3], tuple[4]];
+      return {
+        id: 1000 + i,
+        text: tuple[0],
+        options,
+        correctAnswer: options[tuple[5]] || options[0],
+        category: (payload.c || 'All') as QuizCategory,
+      };
+    }),
   };
 }
 
