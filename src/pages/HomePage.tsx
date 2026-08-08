@@ -245,6 +245,9 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
                 </div>
                 {wallet.error && <p className="text-red-500 text-xs mt-1 text-center">{wallet.error}</p>}
                 {wallet.isConnecting && <p className="text-brand-500 text-xs mt-1 animate-pulse">Connecting...</p>}
+                <button onClick={onOpenArena} className="btn-ghost text-xs mt-2">
+                  <Swords size={14} className="text-orange-500" /> Browse Challenge Arena
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
