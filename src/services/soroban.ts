@@ -18,6 +18,7 @@ import {
   xdr,
 } from '@stellar/stellar-sdk';
 import quizData from '../data/questions.json';
+import type { Question } from '../types';
 import { requestAccess, signTransaction, isConnected } from '@stellar/freighter-api';
 import albedo from '@albedo-link/intent';
 import {
@@ -503,7 +504,8 @@ export async function payEntryFee(userAddress: string): Promise<boolean> {
  */
 export async function submitBatchAnswers(
   userAddress: string,
-  answers: { id: number; answer: string }[]
+  answers: { id: number; answer: string }[],
+  activeQuestions?: Question[]
 ): Promise<{ score: number; hash: string }> {
   let hash: string | undefined;
   console.log(`[submitBatchAnswers] Submitting ${answers.length} answers…`);
@@ -555,9 +557,10 @@ export async function submitBatchAnswers(
       throw new ContractCallError('submit_batch', 'Transaction confirmed as FAILED on-chain.', hash);
     }
 
-    // Count locally correct answers (contract returns score but parsing resultMetaXdr is complex)
+    // Count locally correct answers using active question pool if available
+    const pool = activeQuestions && activeQuestions.length > 0 ? activeQuestions : (quizData as any[]);
     const score = answers.filter((a) => {
-      const q = (quizData as any[]).find((q: any) => q.id === a.id);
+      const q = pool.find((item: any) => item.id === a.id);
       return q && q.correctAnswer === a.answer;
     }).length;
 

@@ -320,21 +320,30 @@ export function QuizPage({
           id: q.id,
           answer: results[q.id]?.userAnswer || '',
         }));
-        const { score, hash } = await submitBatchAnswers(userAddress, allAnswers);
+
+        const detailedResults = questions.map((q) => results[q.id] || {
+          questionId: q.id,
+          questionText: q.text,
+          userAnswer: '',
+          correctAnswer: q.correctAnswer,
+          correct: false,
+          timedOut: false,
+          category: q.category,
+        });
+
+        const actualScore = detailedResults.filter((r) => r.correct).length;
+
+        const { hash } = await submitBatchAnswers(userAddress, allAnswers, questions);
         setTxStatus({ state: 'success', hash, error: null, functionName: 'submit_batch' });
         try {
           const events = await listenForQuizEvents(ledgerAtStart);
           if (events.length > 0) setRecentEvents(events);
         } catch {}
-        if (score > highestScore) {
-          setHighestScore(score);
+        if (actualScore > highestScore) {
+          setHighestScore(actualScore);
         }
         clearQuizState();
-        const detailedResults = questions.map((q) => results[q.id] || {
-          questionId: q.id, questionText: q.text, userAnswer: '', correctAnswer: q.correctAnswer,
-          correct: false, timedOut: false, category: q.category,
-        });
-        onComplete(score, questions.length, hash, detailedResults);
+        onComplete(actualScore, questions.length, hash, detailedResults);
       } catch (e: unknown) {
         const { message, type } = classifyError(e);
         setError(message);
