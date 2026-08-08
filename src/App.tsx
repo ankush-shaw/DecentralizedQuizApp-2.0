@@ -2,13 +2,16 @@ import { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useWallet } from './hooks/useWallet';
 import { useTheme } from './hooks/useTheme';
+import { useChallenge } from './hooks/useChallenge';
 import { initializeContract } from './services/soroban';
 import { getActiveNetworkName, setActiveNetwork } from './config/networks';
 import type { NetworkName } from './config/networks';
-import type { QuizCategory, QuizResult } from './types';
+import type { QuizCategory, QuizResult, Question } from './types';
 import { HomePage } from './pages/HomePage';
 import { QuizPage } from './pages/QuizPage';
 import { ResultPage } from './pages/ResultPage';
+import { QuizBuilder } from './components/QuizBuilder';
+import { ChallengeArena } from './components/ChallengeArena';
 import { TransactionStatus } from './components/TransactionStatus';
 import type { TxStatus } from './types';
 
@@ -36,14 +39,20 @@ function App() {
   const [activeNetwork, setNetwork] = useState<NetworkName>(() => getActiveNetworkName());
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory>('All');
 
+  // ── Challenge state
+  const challenge = useChallenge(wallet.address);
+  const [showBuilder, setShowBuilder] = useState(false);
+  const [showArena, setShowArena] = useState(false);
+  const [customQuestions, setCustomQuestions] = useState<Question[] | null>(null);
+  const [customTimePerQ, setCustomTimePerQ] = useState<number | null>(null);
+
   const handleNetworkSwitch = useCallback((network: NetworkName) => {
     setActiveNetwork(network);
     setNetwork(network);
-    // Reload the app data for the new network
     window.location.reload();
   }, []);
 
-  /** Global transaction status — shown as a floating panel across all pages */
+  /** Global transaction status */
   const [txStatus, setTxStatus] = useState<TxStatus>(DEFAULT_TX_STATUS);
 
   const dismissTx = useCallback(() => setTxStatus(DEFAULT_TX_STATUS), []);
@@ -53,10 +62,38 @@ function App() {
       connect('freighter');
       return;
     }
+    setCustomQuestions(null);
+    setCustomTimePerQ(null);
     setPage('quiz');
   };
 
+  /** Start a challenge quiz with custom questions */
+  const handleStartChallenge = () => {
+    if (!wallet.isConnected) {
+      connect('freighter');
+      return;
+    }
+    if (challenge.activeChallenge) {
+      setCustomQuestions(challenge.activeChallenge.questions);
+      setCustomTimePerQ(challenge.activeChallenge.timePerQuestion);
+      setShowArena(false);
+      setPage('quiz');
+    }
+  };
+
   const handleQuizComplete = (score: number, total: number, txHash: string | null, detailedResults: QuizResult[] = []) => {
+    // Record challenge attempt if applicable
+    if (challenge.activeChallenge) {
+      challenge.recordAttempt(
+        challenge.activeChallenge.code,
+        challenge.activeChallenge.title,
+        score,
+        total
+      );
+      challenge.clearChallenge();
+    }
+    setCustomQuestions(null);
+    setCustomTimePerQ(null);
     setOutcome({ score, total, txHash, detailedResults });
     setPage('result');
   };
@@ -114,6 +151,8 @@ function App() {
                 onSwitchNetwork={handleNetworkSwitch}
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
+                onOpenBuilder={() => setShowBuilder(true)}
+                onOpenArena={() => setShowArena(true)}
               />
             </motion.div>
           )}
@@ -128,8 +167,10 @@ function App() {
               <QuizPage
                 userAddress={wallet.address ?? ''}
                 selectedCategory={selectedCategory}
+                customQuestions={customQuestions}
+                customTimePerQuestion={customTimePerQ}
                 onComplete={handleQuizComplete}
-                onBack={() => setPage('home')}
+                onBack={() => { setPage('home'); setCustomQuestions(null); setCustomTimePerQ(null); challenge.clearChallenge(); }}
                 onConnectWallet={connect}
                 setTxStatus={setTxStatus}
                 theme={theme}
@@ -163,6 +204,30 @@ function App() {
 
       {/* Global floating transaction status panel */}
       <TransactionStatus status={txStatus} onDismiss={dismissTx} />
+
+      {/* Quiz Builder Modal */}
+      <AnimatePresence>
+        {showBuilder && wallet.address && (
+          <QuizBuilder
+            creatorAddress={wallet.address}
+            onCreateQuiz={challenge.createQuiz}
+            onClose={() => setShowBuilder(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Challenge Arena Modal */}
+      <AnimatePresence>
+        {showArena && (
+          <ChallengeArena
+            onLoadChallenge={challenge.loadChallenge}
+            onStartChallenge={handleStartChallenge}
+            myAttempts={challenge.myAttempts}
+            getAllStoredChallenges={challenge.getAllStoredChallenges}
+            onClose={() => setShowArena(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
