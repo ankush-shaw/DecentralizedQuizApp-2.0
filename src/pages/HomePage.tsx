@@ -87,6 +87,8 @@ export function HomePage({ wallet, onConnect, onDisconnect, onStartQuiz, onIniti
     { icon: Brain, title: 'On-Chain Questions', desc: 'All questions stored immutably on Stellar Soroban — fully transparent and verifiable.', color: 'bg-violet-50 text-violet-600 border-violet-100' },
     { icon: Shield, title: 'Tamper-Proof Scoring', desc: 'Your score is verified and recorded by smart contracts. No admin, no cheating.', color: 'bg-blue-50 text-blue-600 border-blue-100' },
     { icon: Layers, title: 'Permissionless', desc: 'Anyone can build, play, and verify results on the Stellar network without permission.', color: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
+    { icon: PenTool, title: 'Custom Quiz Builder', desc: 'Create your own quizzes with custom questions, time limits, and shareable challenge codes.', color: 'bg-pink-50 text-pink-600 border-pink-100' },
+    { icon: Swords, title: 'Challenge Arena', desc: 'Enter challenge codes to compete on peer-to-peer quizzes. Track scores and leaderboards.', color: 'bg-orange-50 text-orange-600 border-orange-100' },
   ];
 
   return (
