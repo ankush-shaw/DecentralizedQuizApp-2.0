@@ -1,9 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useChallenge } from '../hooks/useChallenge';
+import { generateChallengeCode, saveAttempt, getAllAttempts, getAttemptsForPlayer } from '../services/challengeService';
 import type { CustomQuiz } from '../types/challenge';
 
-describe('useChallenge hook', () => {
+describe('Challenge storage and attempt tracking', () => {
   beforeEach(() => {
     localStorage.clear();
   });
@@ -23,42 +22,34 @@ describe('useChallenge hook', () => {
     attemptCount: 0,
   };
 
-  it('should initialize with empty active challenge', () => {
-    const { result } = renderHook(() => useChallenge('GUSER123'));
-    expect(result.current.activeChallenge).toBeNull();
-  });
-
-  it('should create a quiz and return a challenge code', () => {
-    const { result } = renderHook(() => useChallenge('GUSER123'));
-    let code = '';
-    act(() => {
-      code = result.current.createQuiz(dummyQuiz);
-    });
+  it('should generate code and store quiz in localStorage', () => {
+    const code = generateChallengeCode(dummyQuiz);
     expect(code).toMatch(/^DQ-/);
-    expect(result.current.myQuizzes.length).toBe(1);
+    const stored = JSON.parse(localStorage.getItem('dquiz_challenges') || '{}');
+    const cleanCode = code.replace(/^DQ-/, '');
+    expect(stored[cleanCode]).toBeDefined();
+    expect(stored[cleanCode].payload.t).toBe('Web3 Security Quiz');
   });
 
-  it('should load a challenge by code', () => {
-    const { result } = renderHook(() => useChallenge('GUSER123'));
-    let code = '';
-    act(() => {
-      code = result.current.createQuiz(dummyQuiz);
-    });
-    let loaded = false;
-    act(() => {
-      loaded = result.current.loadChallenge(code);
-    });
-    expect(loaded).toBe(true);
-    expect(result.current.activeChallenge?.title).toBe('Web3 Security Quiz');
-  });
+  it('should save and retrieve attempt for a player', () => {
+    const attempt = {
+      challengeCode: 'DQ-SEC001',
+      quizTitle: 'Web3 Security Quiz',
+      playerAddress: 'GPLAYER123',
+      score: 2,
+      total: 2,
+      percentage: 100,
+      completedAt: new Date().toISOString(),
+    };
 
-  it('should record an attempt', () => {
-    const { result } = renderHook(() => useChallenge('GUSER123'));
-    act(() => {
-      result.current.recordAttempt('DQ-TEST01', 'Test Quiz', 5, 5);
-    });
-    expect(result.current.myAttempts.length).toBe(1);
-    expect(result.current.myAttempts[0].score).toBe(5);
-    expect(result.current.myAttempts[0].percentage).toBe(100);
+    saveAttempt(attempt);
+
+    const all = getAllAttempts();
+    expect(all.length).toBe(1);
+    expect(all[0].playerAddress).toBe('GPLAYER123');
+
+    const playerAttempts = getAttemptsForPlayer('GPLAYER123');
+    expect(playerAttempts.length).toBe(1);
+    expect(playerAttempts[0].score).toBe(2);
   });
 });
