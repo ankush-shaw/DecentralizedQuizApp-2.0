@@ -152,9 +152,10 @@ The project uses **GitHub Actions** to automatically run on every push and pull 
 - 💧 **Prominent Friendbot Integration:** 1-click funding for new testnet accounts directly from the UI navbar.
 - 🏆 **On-chain Leaderboard & Personal Bests:** Top-5 scores stored via smart contract, with highest personal scores tracked locally.
 - 🏅 **Web3 NFT Achievement Badge & Certificate:** Animated modal with Gold/Silver/Bronze tier badges, on-chain certificate, and 1-click SIP-0016 NFT Metadata JSON copy.
+- 🎨 **Custom Quiz Builder & Challenge Arena:** Create custom quizzes with unique 6-character Challenge Codes (`DQ-XXXXXX`), shareable P2P challenges, and dedicated challenge leaderboards.
 - 📊 **Detailed Performance Review:** Question-by-question accuracy breakdown with correct/incorrect/timed-out stats and expandable answer review.
 - 🚀 **Social Sharing:** Web Share API integration to share on-chain quiz scores with friends.
-- 📊 **Vitest Frontend Tests:** 8/8 tests passing, covering wallet connection, signing, and error handling.
+- 📊 **Vitest Frontend Tests:** 14/14 tests passing across 3 test suites, covering wallet connection, challenge encoding/decoding, and storage persistence.
 
 ---
 
